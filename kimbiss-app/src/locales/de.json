@@ -28,7 +28,9 @@
     "invalid_image": "Mit dem Bild kann ich nichts anfangen. Nimm ein anderes Foto.",
     "no_food": "Auf dem Foto ist kein Essen zu erkennen.",
     "save_failed": "Speichern hat nicht geklappt. Versuch es noch einmal.",
-    "load_failed": "Laden hat nicht geklappt. Prüf deine Verbindung."
+    "load_failed": "Laden hat nicht geklappt. Prüf deine Verbindung.",
+    "invalid_name": "Der Name braucht 3 bis 32 Zeichen, zum Beispiel Buchstaben, Zahlen und Leerzeichen.",
+    "invalid_password": "Das Passwort braucht mindestens 8 Zeichen."
   },
   "setup": {
     "progress": "Schritt {{step}} von {{total}}",

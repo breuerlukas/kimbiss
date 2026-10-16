@@ -28,7 +28,9 @@
     "invalid_image": "That image can't be used. Take another photo.",
     "no_food": "There is no food to see in that photo.",
     "save_failed": "Saving didn't work. Try again.",
-    "load_failed": "Loading didn't work. Check your connection."
+    "load_failed": "Loading didn't work. Check your connection.",
+    "invalid_name": "The name needs 3 to 32 characters, such as letters, digits and spaces.",
+    "invalid_password": "The password needs at least 8 characters."
   },
   "setup": {
     "progress": "Step {{step}} of {{total}}",
