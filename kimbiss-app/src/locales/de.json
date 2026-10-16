@@ -121,8 +121,9 @@
     "estimate_hint": "Geschätzt. Prüf die Werte und pass sie bei Bedarf an."
   },
   "photo": {
-    "take": "Essen fotografieren",
-    "looking": "Schaue mir das an…"
+    "take": "Foto machen",
+    "looking": "Schaue mir das an…",
+    "gallery": "Foto aus der Galerie wählen"
   },
   "weight": {
     "title": "Verlauf",

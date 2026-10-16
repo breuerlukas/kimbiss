@@ -27,14 +27,14 @@ export function Budget({ meals, profile }: BudgetProps) {
         {t("today.of_target", { eaten: formatNumber(eaten), target: formatNumber(profile.kcal_target) })}
       </p>
       <Bar share={eaten / profile.kcal_target} color="bg-accent" className="mt-4 h-3" />
-      <dl className="mt-5 grid grid-cols-3 gap-4">
+      <dl className="mt-5 grid grid-cols-3 gap-3">
         {MACROS.map((macro) => {
           const grams = sum(meals, macro.key);
           const target = profile[`${macro.key}_target`];
           return (
             <div key={macro.key}>
-              <dt className="text-sm text-ink-soft">{t(`macros.${macro.key}`)}</dt>
-              <dd className="font-semibold">{formatNumber(grams)}<span className="font-normal text-ink-soft"> / {target} g</span></dd>
+              <dt className="truncate text-sm text-ink-soft">{t(`macros.${macro.key}`)}</dt>
+              <dd className="font-semibold whitespace-nowrap max-[380px]:text-sm">{formatNumber(grams)}<span className="font-normal text-ink-soft"> / {target} g</span></dd>
               <Bar share={target ? grams / target : 0} color={macro.color} className="mt-1.5 h-1.5" />
             </div>
           );

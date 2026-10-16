@@ -121,8 +121,9 @@
     "estimate_hint": "Estimated. Check the values and adjust them if needed."
   },
   "photo": {
-    "take": "Snap your meal",
-    "looking": "Taking a look…"
+    "take": "Snap meal",
+    "looking": "Taking a look…",
+    "gallery": "Pick a photo from the gallery"
   },
   "weight": {
     "title": "Progress",
