@@ -47,7 +47,7 @@ export function PhotoButton({ onEstimate, onManual }: PhotoButtonProps) {
       {error && <p role="alert" className="mb-2 text-center text-danger">{t(`errors.${error}`, t("errors.unknown"))}</p>}
       <div className="flex gap-3">
         <button type="button" disabled={busy} onClick={() => cameraInput.current?.click()}
-          className="flex h-16 min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl bg-accent text-base font-bold text-accent-ink shadow-[0_4px_0_var(--ink)] transition active:translate-y-1 active:shadow-none disabled:opacity-70">
+          className="flex h-16 min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl bg-accent text-base font-bold text-accent-ink transition active:scale-[0.98] active:brightness-95 disabled:opacity-70">
           <Camera aria-hidden className={`shrink-0 ${busy ? "animate-pulse" : ""}`} />
           <span className="truncate">{t(busy ? "photo.looking" : "photo.take")}</span>
         </button>
