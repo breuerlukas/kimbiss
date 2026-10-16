@@ -4,6 +4,7 @@
    an Imbiss menu board, not a fitness dashboard. Macros keep one colour each
    everywhere they appear. */
 :root {
+  color-scheme: light dark;
   --paper: #f5f1fb;
   --surface: #ffffff;
   --ink: #2a1b3d;
@@ -95,5 +96,30 @@ dialog::backdrop {
   from {
     transform: translateY(24px);
     opacity: 0;
+  }
+}
+
+/* The scanner band over a photo being analysed, as in Insulink. */
+.scan-band {
+  top: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--accent) 45%, transparent),
+    transparent
+  );
+  animation: scan-sweep 1.8s linear infinite alternate;
+}
+
+@keyframes scan-sweep {
+  to {
+    top: calc(100% - 90px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-band {
+    animation: none;
+    top: calc(50% - 45px);
   }
 }

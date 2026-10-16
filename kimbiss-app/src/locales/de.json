@@ -96,7 +96,8 @@
     "kcal": "Energie",
     "protein": "Eiweiß",
     "carbs": "Kohlenhydrate",
-    "fat": "Fett"
+    "fat": "Fett",
+    "carbs_short": "KH"
   },
   "today": {
     "title": "Heute",
@@ -118,12 +119,12 @@
     "kcal": "Energie",
     "delete": "Mahlzeit löschen",
     "recognized": "Auf dem Foto erkannt",
-    "estimate_hint": "Geschätzt. Prüf die Werte und pass sie bei Bedarf an."
+    "estimate_hint": "Geschätzt, bitte prüfen"
   },
   "photo": {
     "take": "Foto machen",
-    "looking": "Schaue mir das an…",
-    "gallery": "Foto aus der Galerie wählen"
+    "gallery": "Foto aus der Galerie wählen",
+    "analysing": "Wird analysiert"
   },
   "weight": {
     "title": "Verlauf",

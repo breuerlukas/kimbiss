@@ -96,7 +96,8 @@
     "kcal": "Energy",
     "protein": "Protein",
     "carbs": "Carbs",
-    "fat": "Fat"
+    "fat": "Fat",
+    "carbs_short": "Carbs"
   },
   "today": {
     "title": "Today",
@@ -118,12 +119,12 @@
     "kcal": "Energy",
     "delete": "Delete meal",
     "recognized": "Seen in the photo",
-    "estimate_hint": "Estimated. Check the values and adjust them if needed."
+    "estimate_hint": "Estimated, please check"
   },
   "photo": {
     "take": "Snap meal",
-    "looking": "Taking a look…",
-    "gallery": "Pick a photo from the gallery"
+    "gallery": "Pick a photo from the gallery",
+    "analysing": "Analysing"
   },
   "weight": {
     "title": "Progress",

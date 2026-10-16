@@ -1,11 +1,13 @@
 import { useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { Camera, Image, Plus } from "lucide-react";
 import { ApiError } from "../api/client.ts";
+import { AnalysingOverlay } from "./AnalysingOverlay.tsx";
 import { estimateMeal, type Estimate } from "./meals.ts";
 import { photoToJpegBase64 } from "./photo.ts";
 
-type PhotoButtonProps = { onEstimate: (estimate: Estimate) => void; onManual: () => void };
+type PhotoButtonProps = { onEstimate: (estimate: Estimate, photoUrl: string) => void; onManual: () => void };
 
 /**
  * The main action opens the camera straight away (`capture`; without it
@@ -17,7 +19,8 @@ export function PhotoButton({ onEstimate, onManual }: PhotoButtonProps) {
   const { t, i18n } = useTranslation();
   const cameraInput = useRef<HTMLInputElement>(null);
   const galleryInput = useRef<HTMLInputElement>(null);
-  const [busy, setBusy] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState<string>();
+  const busy = photoUrl !== undefined;
   const [error, setError] = useState<string>();
 
   async function estimate(input: HTMLInputElement) {
@@ -25,7 +28,9 @@ export function PhotoButton({ onEstimate, onManual }: PhotoButtonProps) {
     if (!file) {
       return;
     }
-    setBusy(true);
+    const url = URL.createObjectURL(file);
+    let keepPhoto = false;
+    setPhotoUrl(url);
     setError(undefined);
     try {
       const result = await estimateMeal(await photoToJpegBase64(file), i18n.language);
@@ -33,23 +38,28 @@ export function PhotoButton({ onEstimate, onManual }: PhotoButtonProps) {
         setError("no_food");
         return;
       }
-      onEstimate(result);
+      onEstimate(result, url);
+      keepPhoto = true;
     } catch (failure) {
       setError(failure instanceof ApiError ? failure.code : "network");
     } finally {
-      setBusy(false);
+      if (!keepPhoto) {
+        URL.revokeObjectURL(url);
+      }
+      setPhotoUrl(undefined);
       input.value = "";
     }
   }
 
   return (
     <div>
+      {photoUrl && createPortal(<AnalysingOverlay photoUrl={photoUrl} />, document.body)}
       {error && <p role="alert" className="mb-2 text-center text-danger">{t(`errors.${error}`, t("errors.unknown"))}</p>}
       <div className="flex gap-3">
         <button type="button" disabled={busy} onClick={() => cameraInput.current?.click()}
           className="flex h-16 min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl bg-accent text-base font-bold text-accent-ink transition active:scale-[0.98] active:brightness-95 disabled:opacity-70">
-          <Camera aria-hidden className={`shrink-0 ${busy ? "animate-pulse" : ""}`} />
-          <span className="truncate">{t(busy ? "photo.looking" : "photo.take")}</span>
+          <Camera aria-hidden className="shrink-0" />
+          <span className="truncate">{t("photo.take")}</span>
         </button>
         <SideButton label={t("photo.gallery")} disabled={busy} onClick={() => galleryInput.current?.click()}>
           <Image aria-hidden />

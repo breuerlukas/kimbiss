@@ -1,29 +1,30 @@
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { formatNumber } from "../locales/format.ts";
-import { Button, Field, numberText, parseNumber, Sheet } from "../ui/ui.tsx";
+import { Trash2 } from "lucide-react";
+import { Button, Sheet } from "../ui/ui.tsx";
+import { EstimateItems, MealHeader, NutrientStrip, type Nutrient } from "./MealParts.tsx";
 import { deleteMeal, saveMeal, type Estimate, type Meal } from "./meals.ts";
 
-/** What the sheet opens with: an existing meal, a photo estimate, or nothing. */
-export type MealDraft = { meal?: Meal; estimate?: Estimate };
+/** What the sheet opens with: an existing meal, a photo estimate (with its photo), or nothing. */
+export type MealDraft = { meal?: Meal; estimate?: Estimate; photoUrl?: string };
 
 type MealSheetProps = { draft: MealDraft | null; day: Date; onClose: () => void; onSaved: () => void };
 
 export function MealSheet({ draft, day, onClose, onSaved }: MealSheetProps) {
   return (
     <Sheet open={draft !== null} onClose={onClose}>
-      {draft && <MealForm key={draft.meal?.id ?? draft.estimate?.name ?? "new"}
+      {draft && <MealForm key={draft.meal?.id ?? draft.photoUrl ?? "new"}
         draft={draft} day={day} onClose={onClose} onSaved={onSaved} />}
     </Sheet>
   );
 }
 
-type Values = { name: string; time: string; kcal?: number; protein?: number; carbs?: number; fat?: number };
-const NUTRIENTS = ["protein", "carbs", "fat"] as const;
+type Values = { name: string; time: string } & Partial<Record<Nutrient, number>>;
 
 /**
- * Edit form for one meal. A photo estimate arrives prefilled with its totals
- * and lists the foods it saw, so an odd number can be traced and corrected.
+ * One meal in Insulink's meal-detail look: the photo on top when there is
+ * one, the name and time, the nutrient strip, and the foods the photo showed,
+ * so an odd number can be traced and corrected before saving.
  */
 function MealForm({ draft, day, onClose, onSaved }: Omit<MealSheetProps, "draft"> & { draft: MealDraft }) {
   const { t } = useTranslation();
@@ -60,50 +61,23 @@ function MealForm({ draft, day, onClose, onSaved }: Omit<MealSheetProps, "draft"
 
   return (
     <form onSubmit={submit} className="grid gap-4">
-      <h2 className="text-2xl font-bold">{t(draft.meal ? "meal.edit" : "meal.add")}</h2>
-      {draft.estimate && <EstimateItems estimate={draft.estimate} />}
-      <div className="grid grid-cols-[1fr_7rem] gap-3">
-        <Field label={t("meal.name")} value={values.name} onChange={(event) => change({ name: event.target.value })} maxLength={120} />
-        <Field label={t("meal.time")} type="time" value={values.time} onChange={(event) => change({ time: event.target.value })} />
-      </div>
-      <Field label={t("meal.kcal")} unit="kcal" inputMode="decimal" value={numberText(values.kcal)}
-        onChange={(event) => change({ kcal: parseNumber(event.target.value) })} />
-      <div className="grid grid-cols-3 gap-3">
-        {NUTRIENTS.map((nutrient) => (
-          <Field key={nutrient} label={t(`macros.${nutrient}`)} unit="g" inputMode="decimal"
-            value={numberText(values[nutrient])}
-            onChange={(event) => change({ [nutrient]: parseNumber(event.target.value) })} />
-        ))}
-      </div>
+      {draft.photoUrl && <img src={draft.photoUrl} alt="" className="h-48 w-full rounded-2xl object-cover" />}
+      <MealHeader name={values.name} time={values.time}
+        onName={(name) => change({ name })} onTime={(time) => change({ time })} />
+      <NutrientStrip values={values} onChange={(nutrient, value) => change({ [nutrient]: value })} />
+      {draft.estimate && <EstimateItems items={draft.estimate.items} />}
       {failed && <p role="alert" className="text-danger">{t("errors.save_failed")}</p>}
-      <div className="flex gap-3">
-        <Button type="button" variant="quiet" onClick={onClose}>{t("common.cancel")}</Button>
-        <Button type="submit" className="flex-1" disabled={busy || !valid}>{t("common.save")}</Button>
+      <Button type="submit" disabled={busy || !valid}>{t("common.save")}</Button>
+      <div className="flex justify-center gap-6">
+        <button type="button" onClick={onClose} className="h-10 text-ink-soft">{t("common.cancel")}</button>
+        {draft.meal && (
+          <button type="button" disabled={busy} onClick={() => run(() => deleteMeal(draft.meal!.id))}
+            className="flex h-10 items-center gap-1.5 font-medium text-danger">
+            <Trash2 size={18} aria-hidden />{t("meal.delete")}
+          </button>
+        )}
       </div>
-      {draft.meal && (
-        <Button type="button" variant="danger" disabled={busy} onClick={() => run(() => deleteMeal(draft.meal!.id))}>
-          {t("meal.delete")}
-        </Button>
-      )}
     </form>
-  );
-}
-
-function EstimateItems({ estimate }: { estimate: Estimate }) {
-  const { t } = useTranslation();
-  return (
-    <div className="rounded-2xl bg-surface p-4">
-      <p className="mb-2 text-sm text-ink-soft">{t("meal.recognized")}</p>
-      <ul className="grid gap-1">
-        {estimate.items.map((item, position) => (
-          <li key={position} className="flex justify-between gap-3">
-            <span>{item.name} <span className="text-ink-soft">{formatNumber(item.grams)} g</span></span>
-            <span className="font-semibold">{formatNumber(item.kcal)}</span>
-          </li>
-        ))}
-      </ul>
-      <p className="mt-3 text-sm text-ink-soft">{t("meal.estimate_hint")}</p>
-    </div>
   );
 }
 
