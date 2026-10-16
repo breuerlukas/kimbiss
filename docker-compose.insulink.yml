@@ -1,0 +1,17 @@
+# Runs Kimbiss on the Insulink server: the app publishes no port of its own,
+# joins Insulink's network as "kimbiss", and Insulink's proxy terminates TLS
+# for it. See docs/INSULINK_SERVER.md.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.insulink.yml up -d --build
+services:
+  app:
+    ports: !reset []
+    networks:
+      default:
+      insulink:
+        aliases: [kimbiss]
+
+networks:
+  insulink:
+    external: true
+    name: ${INSULINK_NETWORK:-insulink-api_default}
