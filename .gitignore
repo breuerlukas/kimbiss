@@ -1,0 +1,8 @@
+.env
+.idea/
+.claude/
+node_modules/
+dist/
+build/
+.gradle/
+*.tsbuildinfo
