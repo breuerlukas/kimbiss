@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: kimbiss
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  # Not published: only the app's nginx reaches it, under /v1/.
+  api:
+    build: ./kimbiss-api
+    restart: always
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/kimbiss
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      KIMBISS_INVITE_CODE: ${KIMBISS_INVITE_CODE:-}
+      KIMBISS_ESTIMATES_PER_DAY: ${KIMBISS_ESTIMATES_PER_DAY:-30}
+      CLAUDE_CODE_OAUTH_TOKEN: ${CLAUDE_CODE_OAUTH_TOKEN:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+  # The PWA plus the /v1/ proxy. Put HTTPS in front of this port: iOS only
+  # installs a web app with a service worker over HTTPS.
+  app:
+    build: ./kimbiss-app
+    restart: always
+    ports:
+      - "${KIMBISS_PORT:-8090}:8080"
+    depends_on:
+      - api
+volumes:
+  pgdata:
