@@ -27,8 +27,8 @@ HTTPS.
 
 **On the iPhone:** open the URL in Safari, Share, *Add to Home Screen*.
 
-**Next to Insulink:** `docs/INSULINK_SERVER.md` runs it behind Insulink's proxy
-on the same server.
+**On a shared server:** `docs/SERVER.md` runs it with its own TLS on its own
+ports, without touching anything else on the host.
 
 ## Who may use it
 

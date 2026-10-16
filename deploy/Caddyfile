@@ -1,0 +1,5 @@
+# TLS for Kimbiss on a shared server. The edge proxy forwards port 80 (HTTP)
+# and passes port 443 through by SNI, so Caddy gets its certificate itself.
+{$KIMBISS_DOMAIN} {
+	reverse_proxy app:8080
+}
