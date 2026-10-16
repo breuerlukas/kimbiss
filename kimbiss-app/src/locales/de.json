@@ -1,0 +1,146 @@
+{
+  "common": {
+    "back": "Zurück",
+    "next": "Weiter",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "retry": "Erneut versuchen"
+  },
+  "auth": {
+    "tagline": "Dein Essenstagebuch. Foto machen, fertig.",
+    "name": "Name",
+    "password": "Passwort",
+    "invite_code": "Einladungscode",
+    "signin": "Anmelden",
+    "signup": "Konto erstellen",
+    "to_signup": "Neu hier? Mit Einladungscode registrieren",
+    "to_signin": "Schon ein Konto? Anmelden"
+  },
+  "errors": {
+    "invalid_invite_code": "Der Einladungscode stimmt nicht.",
+    "name_taken": "Den Namen gibt es schon. Nimm einen anderen.",
+    "wrong_credentials": "Name oder Passwort stimmt nicht.",
+    "too_many_attempts": "Zu viele Versuche. Probier es in 15 Minuten wieder.",
+    "network": "Keine Verbindung zum Server. Prüf dein Internet.",
+    "unknown": "Das hat nicht geklappt. Versuch es noch einmal.",
+    "estimate_limit": "Für heute sind alle Foto-Schätzungen aufgebraucht. Trag die Mahlzeit von Hand ein.",
+    "estimate_unavailable": "Das Foto konnte gerade nicht ausgewertet werden. Versuch es gleich noch einmal oder trag es von Hand ein.",
+    "invalid_image": "Mit dem Bild kann ich nichts anfangen. Nimm ein anderes Foto.",
+    "no_food": "Auf dem Foto ist kein Essen zu erkennen.",
+    "save_failed": "Speichern hat nicht geklappt. Versuch es noch einmal.",
+    "load_failed": "Laden hat nicht geklappt. Prüf deine Verbindung."
+  },
+  "setup": {
+    "progress": "Schritt {{step}} von {{total}}",
+    "finish": "Los geht's",
+    "birth_year": "Geburtsjahr",
+    "height": "Größe",
+    "current_weight": "Aktuelles Gewicht",
+    "goal_weight": "Zielgewicht",
+    "goal_hint": "Gleiches Gewicht wie jetzt heißt: halten.",
+    "goal_too_low": "Für deine Größe schlage ich mindestens {{kg}} kg vor.",
+    "sex": {
+      "female": "Weiblich",
+      "male": "Männlich",
+      "hint": "Nur für die Berechnung des Grundumsatzes."
+    },
+    "body": {
+      "title": "Erzähl kurz von dir",
+      "intro": "Damit lässt sich dein Energiebedarf grob schätzen."
+    },
+    "weight": {
+      "title": "Wo willst du hin?",
+      "intro": "Dein jetziges Gewicht und dein Ziel."
+    },
+    "activity": {
+      "title": "Wie viel bewegst du dich?",
+      "intro": "Ein normaler Tag, Sport mitgezählt.",
+      "sedentary": {
+        "_": "Wenig",
+        "hint": "Viel Sitzen, kaum Sport"
+      },
+      "light": {
+        "_": "Etwas",
+        "hint": "Spaziergänge, ein bis zwei Mal Sport pro Woche"
+      },
+      "moderate": {
+        "_": "Regelmäßig",
+        "hint": "Drei bis fünf Mal Sport pro Woche"
+      },
+      "active": {
+        "_": "Viel",
+        "hint": "Fast täglich Sport oder körperliche Arbeit"
+      }
+    },
+    "pace": {
+      "title": "Wie schnell soll es gehen?",
+      "intro": "Das legt fest, wie sehr sich dein Gewicht pro Woche verändert. Langsamer fühlt sich weniger nach Verzicht an und ist leichter durchzuhalten.",
+      "calm": "Entspannt",
+      "balanced": "Ausgewogen",
+      "brisk": "Zügig",
+      "hint_lose": "etwa {{kg}} kg pro Woche, dafür rund {{kcal}} kcal am Tag unter deinem Bedarf",
+      "hint_gain": "etwa {{kg}} kg pro Woche, dafür rund {{kcal}} kcal am Tag über deinem Bedarf"
+    },
+    "summary": {
+      "title": "Dein Vorschlag",
+      "intro": "Daraus ergeben sich diese Tagesziele. Du kannst alles anpassen.",
+      "maintenance": "Dein Körper braucht etwa {{kcal}} kcal am Tag.",
+      "goal_date": "So erreichst du dein Zielgewicht ungefähr im {{date}}, in {{weeks}} Wochen.",
+      "hold": "Damit hältst du dein Gewicht.",
+      "no_date": "In diesem Tempo lässt sich kein Datum schätzen.",
+      "kcal": "Energie pro Tag",
+      "hint": "Schätzwerte, kein ärztlicher Rat. Du kannst die Ziele jederzeit im Profil ändern."
+    }
+  },
+  "macros": {
+    "kcal": "Energie",
+    "protein": "Eiweiß",
+    "carbs": "Kohlenhydrate",
+    "fat": "Fett"
+  },
+  "today": {
+    "title": "Heute",
+    "budget": "Tagesziel",
+    "kcal_left": "kcal sind heute noch frei",
+    "kcal_over": "kcal über dem Tagesziel",
+    "of_target": "{{eaten}} von {{target}} kcal gegessen",
+    "receipt": "Dein Bon",
+    "empty": "Noch nichts eingetragen. Fotografier dein nächstes Essen.",
+    "total": "Summe",
+    "previous_day": "Vorheriger Tag",
+    "next_day": "Nächster Tag"
+  },
+  "meal": {
+    "add": "Mahlzeit eintragen",
+    "edit": "Mahlzeit bearbeiten",
+    "name": "Was gab es?",
+    "time": "Uhrzeit",
+    "kcal": "Energie",
+    "delete": "Mahlzeit löschen",
+    "recognized": "Auf dem Foto erkannt",
+    "estimate_hint": "Geschätzt. Prüf die Werte und pass sie bei Bedarf an."
+  },
+  "photo": {
+    "take": "Essen fotografieren",
+    "looking": "Schaue mir das an…"
+  },
+  "weight": {
+    "title": "Verlauf",
+    "goal": "Zielgewicht: {{kg}} kg",
+    "today": "Gewicht heute",
+    "chart_empty": "Ab zwei Einträgen siehst du hier deinen Verlauf.",
+    "chart_label": "Gewichtsverlauf mit Zielgewicht",
+    "delete": "Eintrag löschen"
+  },
+  "profile": {
+    "targets": "Deine Tagesziele",
+    "rerun_setup": "Ziele neu berechnen",
+    "language": "Sprache",
+    "sign_out": "Abmelden"
+  },
+  "tabs": {
+    "today": "Heute",
+    "weight": "Verlauf",
+    "profile": "Profil"
+  }
+}

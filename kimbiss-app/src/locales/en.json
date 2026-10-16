@@ -1,0 +1,146 @@
+{
+  "common": {
+    "back": "Back",
+    "next": "Next",
+    "cancel": "Cancel",
+    "save": "Save",
+    "retry": "Try again"
+  },
+  "auth": {
+    "tagline": "Your food diary. Snap a photo, done.",
+    "name": "Name",
+    "password": "Password",
+    "invite_code": "Invite code",
+    "signin": "Sign in",
+    "signup": "Create account",
+    "to_signup": "New here? Sign up with an invite code",
+    "to_signin": "Already have an account? Sign in"
+  },
+  "errors": {
+    "invalid_invite_code": "That invite code is not right.",
+    "name_taken": "That name is taken. Pick another one.",
+    "wrong_credentials": "Name or password is wrong.",
+    "too_many_attempts": "Too many attempts. Try again in 15 minutes.",
+    "network": "Can't reach the server. Check your connection.",
+    "unknown": "That didn't work. Try again.",
+    "estimate_limit": "All photo estimates for today are used up. Add the meal by hand.",
+    "estimate_unavailable": "The photo couldn't be read right now. Try again in a moment or add it by hand.",
+    "invalid_image": "That image can't be used. Take another photo.",
+    "no_food": "There is no food to see in that photo.",
+    "save_failed": "Saving didn't work. Try again.",
+    "load_failed": "Loading didn't work. Check your connection."
+  },
+  "setup": {
+    "progress": "Step {{step}} of {{total}}",
+    "finish": "Let's go",
+    "birth_year": "Year of birth",
+    "height": "Height",
+    "current_weight": "Current weight",
+    "goal_weight": "Goal weight",
+    "goal_hint": "The same weight as now means: hold it.",
+    "goal_too_low": "For your height I suggest at least {{kg}} kg.",
+    "sex": {
+      "female": "Female",
+      "male": "Male",
+      "hint": "Only used to estimate your resting energy."
+    },
+    "body": {
+      "title": "Tell me about you",
+      "intro": "This gives a rough estimate of your energy needs."
+    },
+    "weight": {
+      "title": "Where are you headed?",
+      "intro": "Your weight now and your goal."
+    },
+    "activity": {
+      "title": "How much do you move?",
+      "intro": "A normal day, sport included.",
+      "sedentary": {
+        "_": "Little",
+        "hint": "Mostly sitting, hardly any sport"
+      },
+      "light": {
+        "_": "Some",
+        "hint": "Walks, sport once or twice a week"
+      },
+      "moderate": {
+        "_": "Regularly",
+        "hint": "Sport three to five times a week"
+      },
+      "active": {
+        "_": "A lot",
+        "hint": "Sport almost daily or physical work"
+      }
+    },
+    "pace": {
+      "title": "How fast should it go?",
+      "intro": "This sets how much your weight changes per week. Slower feels less like giving things up and is easier to keep up.",
+      "calm": "Relaxed",
+      "balanced": "Balanced",
+      "brisk": "Brisk",
+      "hint_lose": "about {{kg}} kg per week, about {{kcal}} kcal a day below what your body needs",
+      "hint_gain": "about {{kg}} kg per week, about {{kcal}} kcal a day above what your body needs"
+    },
+    "summary": {
+      "title": "Your suggestion",
+      "intro": "These are the daily targets that follow. You can change all of them.",
+      "maintenance": "Your body needs about {{kcal}} kcal a day.",
+      "goal_date": "That gets you to your goal weight around {{date}}, in {{weeks}} weeks.",
+      "hold": "That keeps your weight where it is.",
+      "no_date": "At this pace there is no date to estimate.",
+      "kcal": "Energy per day",
+      "hint": "Estimates, not medical advice. You can change the targets any time in your profile."
+    }
+  },
+  "macros": {
+    "kcal": "Energy",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat"
+  },
+  "today": {
+    "title": "Today",
+    "budget": "Daily target",
+    "kcal_left": "kcal still free today",
+    "kcal_over": "kcal over the daily target",
+    "of_target": "{{eaten}} of {{target}} kcal eaten",
+    "receipt": "Your receipt",
+    "empty": "Nothing logged yet. Snap your next meal.",
+    "total": "Total",
+    "previous_day": "Previous day",
+    "next_day": "Next day"
+  },
+  "meal": {
+    "add": "Add meal",
+    "edit": "Edit meal",
+    "name": "What did you have?",
+    "time": "Time",
+    "kcal": "Energy",
+    "delete": "Delete meal",
+    "recognized": "Seen in the photo",
+    "estimate_hint": "Estimated. Check the values and adjust them if needed."
+  },
+  "photo": {
+    "take": "Snap your meal",
+    "looking": "Taking a look…"
+  },
+  "weight": {
+    "title": "Progress",
+    "goal": "Goal weight: {{kg}} kg",
+    "today": "Weight today",
+    "chart_empty": "From two entries on, your progress shows up here.",
+    "chart_label": "Weight over time with goal weight",
+    "delete": "Delete entry"
+  },
+  "profile": {
+    "targets": "Your daily targets",
+    "rerun_setup": "Recalculate targets",
+    "language": "Language",
+    "sign_out": "Sign out"
+  },
+  "tabs": {
+    "today": "Today",
+    "weight": "Progress",
+    "profile": "Profile"
+  }
+}

@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+/* Lilac paper, aubergine ink and a violet accent (Kim's favourite colour):
+   an Imbiss menu board, not a fitness dashboard. Macros keep one colour each
+   everywhere they appear. */
+:root {
+  --paper: #f5f1fb;
+  --surface: #ffffff;
+  --ink: #2a1b3d;
+  --ink-soft: #6b5f78;
+  --line: #e2d9ef;
+  --accent: #7d4cdb;
+  --accent-ink: #ffffff;
+  --protein: #c04a7e;
+  --carbs: #d49a12;
+  --fat: #4f8f6b;
+  --danger: #b8432b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #1d1526;
+    --surface: #2a2035;
+    --ink: #f3eef7;
+    --ink-soft: #b3a8bf;
+    --line: #3d3249;
+    --protein: #e07aa8;
+    --carbs: #f0bb3a;
+    --fat: #7cc29b;
+    --danger: #ef8a72;
+    --accent: #b48cf7;
+    --accent-ink: #1d1526;
+  }
+}
+
+@theme inline {
+  --font-sans: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-protein: var(--protein);
+  --color-carbs: var(--carbs);
+  --color-fat: var(--fat);
+  --color-danger: var(--danger);
+}
+
+html,
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+body {
+  font-variant-numeric: tabular-nums;
+}
+
+/* iOS zooms into any input under 16px. */
+input,
+select {
+  font-size: 16px;
+}
+
+/* Inputs show focus on their field frame instead. */
+:focus-visible:not(input) {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* The torn bottom edge of the day's receipt. */
+.receipt-edge {
+  --tooth: 10px;
+  mask:
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg)
+    50% / calc(var(--tooth) * 2) 100%;
+}
+
+dialog::backdrop {
+  background: rgb(29 21 38 / 0.45);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  dialog[open] {
+    animation: sheet-up 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}
