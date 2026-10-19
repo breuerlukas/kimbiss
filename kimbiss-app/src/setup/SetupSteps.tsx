@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { formatNumber } from "../locales/format.ts";
-import { Choice, Field, numberText, parseNumber } from "../ui/ui.tsx";
+import { Choice, NumberField } from "../ui/ui.tsx";
 import { direction, KCAL_PER_KG, lowestGoalKg, PACES, type Activity, type Answers, type Sex } from "./targets.ts";
 
 export type Draft = Partial<Answers>;
@@ -15,10 +15,10 @@ export function BodyStep({ draft, change }: StepProps) {
         options={sexes.map((sex) => ({ value: sex, label: t(`setup.sex.${sex}`) }))} />
       <p className="text-sm text-ink-soft">{t("setup.sex.hint")}</p>
       <div className="grid grid-cols-2 gap-3">
-        <Field label={t("setup.birth_year")} inputMode="numeric" value={numberText(draft.birthYear)}
-          onChange={(event) => change({ birthYear: parseNumber(event.target.value) })} />
-        <Field label={t("setup.height")} unit="cm" inputMode="numeric" value={numberText(draft.heightCm)}
-          onChange={(event) => change({ heightCm: parseNumber(event.target.value) })} />
+        <NumberField label={t("setup.birth_year")} inputMode="numeric" value={draft.birthYear}
+          onValue={(birthYear) => change({ birthYear })} />
+        <NumberField label={t("setup.height")} unit="cm" inputMode="numeric" value={draft.heightCm}
+          onValue={(heightCm) => change({ heightCm })} />
       </div>
     </div>
   );
@@ -30,12 +30,10 @@ export function WeightStep({ draft, change }: StepProps) {
   const tooLow = lowest !== undefined && draft.goalWeightKg !== undefined && draft.goalWeightKg < lowest;
   return (
     <div className="grid gap-4">
-      <Field label={t("setup.current_weight")} unit="kg" inputMode="decimal"
-        value={numberText(draft.startWeightKg)}
-        onChange={(event) => change({ startWeightKg: parseNumber(event.target.value) })} />
-      <Field label={t("setup.goal_weight")} unit="kg" inputMode="decimal"
-        value={numberText(draft.goalWeightKg)}
-        onChange={(event) => change({ goalWeightKg: parseNumber(event.target.value) })} />
+      <NumberField label={t("setup.current_weight")} unit="kg" value={draft.startWeightKg}
+        onValue={(startWeightKg) => change({ startWeightKg })} />
+      <NumberField label={t("setup.goal_weight")} unit="kg" value={draft.goalWeightKg}
+        onValue={(goalWeightKg) => change({ goalWeightKg })} />
       <p className={tooLow ? "text-danger" : "text-sm text-ink-soft"}>
         {tooLow ? t("setup.goal_too_low", { kg: lowest }) : t("setup.goal_hint")}
       </p>

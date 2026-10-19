@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { formatDate, formatNumber } from "../locales/format.ts";
-import { Field, numberText, parseNumber } from "../ui/ui.tsx";
+import { NumberField } from "../ui/ui.tsx";
 import { direction, type Answers, type Targets } from "./targets.ts";
 
 type SummaryProps = {
@@ -30,14 +30,12 @@ export function SetupSummary({ answers, targets, change }: SummaryProps) {
           })
           : t(direction(answers) === 0 ? "setup.summary.hold" : "setup.summary.no_date")}
       </p>
-      <Field label={t("setup.summary.kcal")} unit="kcal" inputMode="numeric"
-        value={numberText(targets.kcal)}
-        onChange={(event) => change({ kcal: parseNumber(event.target.value) })} />
+      <NumberField label={t("setup.summary.kcal")} unit="kcal" inputMode="numeric"
+        value={targets.kcal} onValue={(kcal) => change({ kcal })} />
       <div className="grid grid-cols-3 gap-3">
         {macros.map((macro) => (
-          <Field key={macro.key} label={t(`macros.${macro.key}`)} unit="g" inputMode="numeric"
-            value={numberText(macro.value)}
-            onChange={(event) => change({ [macro.key]: parseNumber(event.target.value) })} />
+          <NumberField key={macro.key} label={t(`macros.${macro.key}`)} unit="g" inputMode="numeric"
+            value={macro.value} onValue={(grams) => change({ [macro.key]: grams })} />
         ))}
       </div>
       <p className="text-sm text-ink-soft">{t("setup.summary.hint")}</p>
