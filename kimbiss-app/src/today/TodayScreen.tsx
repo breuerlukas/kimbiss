@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useLoad } from "../api/use-load.ts";
@@ -7,16 +7,32 @@ import { MealSheet, type MealDraft } from "../meal/MealSheet.tsx";
 import { findMeals } from "../meal/meals.ts";
 import { PhotoButton } from "../meal/PhotoButton.tsx";
 import type { Profile } from "../profile/profile.ts";
+import { Button } from "../ui/ui.tsx";
 import { Budget } from "./Budget.tsx";
 import { Receipt } from "./Receipt.tsx";
 
-/** One day: what is left, the macros, the receipt, and the photo button. */
+/**
+ * One day: what is left, the macros, the receipt, and the photo button. The day
+ * is kept as days back from today, so "today" follows the clock: an app left
+ * open overnight shows, and saves meals to, the new day once it is back in
+ * front. Budget and receipt only show once the day's meals have loaded, so a
+ * slow or failed load never looks like an empty day.
+ */
 export function TodayScreen({ profile }: { profile: Profile }) {
   const { t } = useTranslation();
-  const [day, setDay] = useState(() => new Date());
+  const [offset, setOffset] = useState(0);
+  const [, wake] = useReducer((count: number) => count + 1, 0);
   const [draft, setDraft] = useState<MealDraft | null>(null);
+  const now = new Date();
+  const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, 12);
   const meals = useLoad(() => findMeals(day), day.toDateString());
-  const isToday = day.toDateString() === new Date().toDateString();
+  const isToday = offset === 0;
+
+  useEffect(() => {
+    const show = () => wake();
+    document.addEventListener("visibilitychange", show);
+    return () => document.removeEventListener("visibilitychange", show);
+  }, []);
 
   /** Closes the meal sheet and frees the estimate photo it may have shown. */
   function closeSheet() {
@@ -27,7 +43,7 @@ export function TodayScreen({ profile }: { profile: Profile }) {
   }
 
   function shiftDay(days: number) {
-    setDay(new Date(day.getFullYear(), day.getMonth(), day.getDate() + days, 12));
+    setOffset(offset + days);
   }
 
   return (
@@ -41,11 +57,20 @@ export function TodayScreen({ profile }: { profile: Profile }) {
           <IconButton label={t("today.next_day")} onClick={() => shiftDay(1)} disabled={isToday}><ChevronRight /></IconButton>
         </div>
       </header>
-      {meals.failed && <p role="alert" className="mb-4 text-danger">{t("errors.load_failed")}</p>}
-      <Budget meals={meals.data ?? []} profile={profile} />
-      <div className="mt-8">
-        <Receipt meals={meals.data ?? []} onOpen={(meal) => setDraft({ meal })} />
-      </div>
+      {meals.failed && (
+        <div role="alert" className="mb-4 flex items-center justify-between gap-3">
+          <p className="text-danger">{t("errors.load_failed")}</p>
+          <Button variant="quiet" onClick={meals.reload}>{t("common.retry")}</Button>
+        </div>
+      )}
+      {meals.data && (
+        <>
+          <Budget meals={meals.data} profile={profile} />
+          <div className="mt-8">
+            <Receipt meals={meals.data} onOpen={(meal) => setDraft({ meal })} />
+          </div>
+        </>
+      )}
       <div className="fixed inset-x-0 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] mx-auto max-w-lg px-5">
         <PhotoButton onEstimate={(estimate, photoUrl) => setDraft({ estimate, photoUrl })} onManual={() => setDraft({})} />
       </div>
