@@ -1,17 +1,22 @@
 # Production on a server Kimbiss shares with other services (Insulink first).
 # Kimbiss terminates its own TLS with Caddy on its own ports and never touches
 # ports 80 and 443 of the host. Hard limits keep it from starving its
-# neighbours. See docs/SERVER.md.
+# neighbours. The api and the app come as images CI published from main; a
+# timer on the server pulls them (deploy/kimbiss-update.*). See docs/SERVER.md.
 #
-#   docker compose -f docker-compose.yml -f docker-compose.server.yml up -d --build
+#   docker compose -f docker-compose.yml -f docker-compose.server.yml up -d
 services:
   postgres:
     mem_limit: 256m
     cpus: 0.5
   api:
+    build: !reset null
+    image: ghcr.io/breuerlukas/kimbiss-api:latest
     mem_limit: 1g
     cpus: 1.0
   app:
+    build: !reset null
+    image: ghcr.io/breuerlukas/kimbiss-app:latest
     ports: !reset []
     mem_limit: 64m
     cpus: 0.25
@@ -24,7 +29,9 @@ services:
       - "${KIMBISS_HTTP_PORT:-8088}:80"
       - "${KIMBISS_HTTPS_PORT:-8443}:443"
     volumes:
-      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # The folder, not the file: git replaces a pulled file, and a file mount
+      # would keep showing the old one.
+      - ./deploy:/etc/caddy:ro
       - caddy-data:/data
     mem_limit: 128m
     cpus: 0.25
