@@ -99,27 +99,72 @@ dialog::backdrop {
   }
 }
 
-/* The scanner band over a photo being analysed, as in Insulink. */
+/* The photo being analysed, as in Insulink: a violet line sweeps over it,
+   easing into each turn, and lights the food's outlines where it passes.
+   --scan runs from 0 (top) to 1 (bottom); --presence dims the line and the
+   glow toward the turns so they stay quiet, without letting the line vanish. */
+@property --scan {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+.scan {
+  --presence: sqrt(max(0, sin(var(--scan) * 180deg)));
+  --line: calc(var(--scan) * (100% - 90px) + 45px);
+  animation: scan-sweep 1.8s cubic-bezier(0.37, 0, 0.63, 1) infinite alternate;
+}
+
+@keyframes scan-sweep {
+  to {
+    --scan: 1;
+  }
+}
+
 .scan-band {
-  top: 0;
+  top: calc(var(--scan) * (100% - 90px));
+  opacity: calc(0.35 + 0.65 * var(--presence));
   background: linear-gradient(
     to bottom,
     transparent,
     color-mix(in srgb, var(--accent) 45%, transparent),
     transparent
   );
-  animation: scan-sweep 1.8s linear infinite alternate;
 }
 
-@keyframes scan-sweep {
-  to {
-    top: calc(100% - 90px);
-  }
+/* Only a soft band of the outlines around the line lights up. */
+.scan-glow {
+  opacity: var(--presence);
+  mask-image: linear-gradient(
+    to bottom,
+    transparent calc(var(--line) - 9%),
+    rgb(0 0 0 / 0.7) calc(var(--line) - 4.5%),
+    #000 var(--line),
+    rgb(0 0 0 / 0.7) calc(var(--line) + 4.5%),
+    transparent calc(var(--line) + 9%)
+  );
 }
 
+/* The outline image (white, alpha = edge strength) tinted in the accent. */
+.food-outlines {
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  mask: var(--outlines) 0 0 / 100% 100% no-repeat;
+}
+
+/* Reduced motion: no line, the outlines rest softly lit. */
 @media (prefers-reduced-motion: reduce) {
-  .scan-band {
+  .scan {
     animation: none;
-    top: calc(50% - 45px);
+  }
+
+  .scan-band {
+    display: none;
+  }
+
+  .scan-glow {
+    opacity: 0.6;
+    mask-image: none;
   }
 }
