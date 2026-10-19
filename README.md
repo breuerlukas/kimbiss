@@ -51,6 +51,11 @@ The api runs the Claude Code CLI headless per photo, with no tools, no MCP
 servers and no settings, so text inside a photo has nothing to call. The answer
 is schema-checked JSON with one item per food. Photos are not stored.
 
+The prompt is Insulink's: the model first writes down what it can read on the
+packaging, then counts the pieces (slices, rolls, biscuits) one by one and only
+then weighs them, since a miscount is the costliest mistake. It runs on Opus
+5.5, which counts noticeably better than Sonnet; a run takes 5 to 30 seconds.
+
 Sign-in token: run `claude setup-token` on any machine with a browser and put
 the token into `.env` as `CLAUDE_CODE_OAUTH_TOKEN`. It lasts about a year. For a
 deployment that serves other people, use `ANTHROPIC_API_KEY` instead.
