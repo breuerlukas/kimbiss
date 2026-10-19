@@ -1,3 +1,5 @@
+# Pinned, so the volumes (pgdata) keep their names whatever the folder is called.
+name: kimbiss
 services:
   postgres:
     image: postgres:17-alpine

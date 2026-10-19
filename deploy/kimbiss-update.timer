@@ -1,0 +1,10 @@
+# Runs kimbiss-update.service every five minutes.
+[Unit]
+Description=Update Kimbiss every five minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target
