@@ -26,6 +26,14 @@ services:
       KIMBISS_ESTIMATES_PER_DAY: ${KIMBISS_ESTIMATES_PER_DAY:-30}
       CLAUDE_CODE_OAUTH_TOKEN: ${CLAUDE_CODE_OAUTH_TOKEN:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    # /v1/health answers once Spring is up; boot takes about 15 s, longer
+    # under the server's CPU limit.
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8080/v1/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 90s
+      retries: 3
     depends_on:
       postgres:
         condition: service_healthy
@@ -36,6 +44,13 @@ services:
     restart: always
     ports:
       - "${KIMBISS_PORT:-8090}:8080"
+    # The app itself, not /v1/: an api restart must not mark the app broken.
+    # 127.0.0.1, since nginx listens on IPv4 only and localhost may be ::1.
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://127.0.0.1:8080/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     depends_on:
       - api
 volumes:

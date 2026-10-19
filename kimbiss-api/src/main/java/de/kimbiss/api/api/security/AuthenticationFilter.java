@@ -12,7 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- * Every route except {@code /auth/} needs {@code Authorization: Bearer <token>}
+ * Every route except {@code /auth/} and {@code /health} needs {@code Authorization: Bearer <token>}
  * of an open session. The caller's id lands in the {@link #USER_ID} request
  * attribute, so controllers take it as {@code @RequestAttribute}. 401 otherwise.
  */
@@ -39,7 +39,8 @@ public final class AuthenticationFilter extends OncePerRequestFilter {
 
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
-    return request.getServletPath().startsWith("/auth/");
+    var path = request.getServletPath();
+    return path.startsWith("/auth/") || path.equals("/health");
   }
 
   /** The bearer token, or an empty string that matches no session. */
