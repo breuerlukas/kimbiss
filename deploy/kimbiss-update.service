@@ -18,6 +18,8 @@ WorkingDirectory=/home/kimbiss
 Environment=COMPOSE_FILE=docker-compose.yml:docker-compose.server.yml
 ExecStart=git pull --ff-only
 ExecStart=docker compose pull api app caddy
-ExecStart=docker compose up -d
+# Waits until every container reports healthy, so a broken image shows up as
+# a failed run in the journal (and skips the reload and prune).
+ExecStart=docker compose up -d --wait --wait-timeout 180
 ExecStart=docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile
 ExecStart=docker image prune -f

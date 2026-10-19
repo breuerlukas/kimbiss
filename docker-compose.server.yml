@@ -33,6 +33,13 @@ services:
       # would keep showing the old one.
       - ./deploy:/etc/caddy:ro
       - caddy-data:/data
+    # Caddy's admin API, inside the container only. Its public sites only
+    # answer for the domain over TLS, so asking them here would test nothing.
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://127.0.0.1:2019/config/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     mem_limit: 128m
     cpus: 0.25
     depends_on:
