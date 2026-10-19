@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { UtensilsCrossed } from "lucide-react";
 import { formatNumber } from "../locales/format.ts";
-import { numberText, parseNumber } from "../ui/ui.tsx";
+import { NumberInput } from "../ui/ui.tsx";
 import type { EstimateItem } from "./meals.ts";
 
 export const NUTRIENTS = ["kcal", "protein", "carbs", "fat"] as const;
@@ -41,8 +41,7 @@ export function NutrientStrip({ values, onChange }: StripProps) {
       {NUTRIENTS.map((nutrient) => (
         <label key={nutrient} className="flex min-w-0 flex-col items-center gap-1 px-1">
           <span className="w-full truncate text-center text-xs text-ink-soft">{t(nutrient === "carbs" ? "macros.carbs_short" : `macros.${nutrient}`)}</span>
-          <input inputMode="decimal" value={numberText(values[nutrient])}
-            onChange={(event) => onChange(nutrient, parseNumber(event.target.value))}
+          <NumberInput value={values[nutrient]} onValue={(value) => onChange(nutrient, value)}
             className={`w-full bg-transparent text-center text-xl font-extrabold outline-none ${nutrient === "kcal" ? "text-accent" : ""}`} />
           <span className="text-xs text-ink-soft">{nutrient === "kcal" ? "kcal" : "g"}</span>
         </label>

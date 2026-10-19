@@ -4,7 +4,7 @@ import { Trash2 } from "lucide-react";
 import { useLoad } from "../api/use-load.ts";
 import { formatDate, formatNumber } from "../locales/format.ts";
 import type { Profile } from "../profile/profile.ts";
-import { Button, Field, numberText, parseNumber } from "../ui/ui.tsx";
+import { Button, NumberField } from "../ui/ui.tsx";
 import { WeightChart } from "./WeightChart.tsx";
 import { addWeight, deleteWeight, findWeights } from "./weights.ts";
 
@@ -34,8 +34,7 @@ export function WeightScreen({ profile }: { profile: Profile }) {
       <p className="mb-4 text-ink-soft">{t("weight.goal", { kg: formatNumber(profile.goal_weight_kg, 1) })}</p>
       <WeightChart entries={entries} goalKg={profile.goal_weight_kg} />
       <form onSubmit={submit} className="mt-6 flex items-end gap-3">
-        <Field className="flex-1" label={t("weight.today")} unit="kg" inputMode="decimal"
-          value={numberText(kg)} onChange={(event) => setKg(parseNumber(event.target.value))} />
+        <NumberField className="flex-1" label={t("weight.today")} unit="kg" value={kg} onValue={setKg} />
         <Button type="submit" disabled={kg === undefined || kg < 30 || kg > 300}>{t("common.save")}</Button>
       </form>
       <ul className="mt-8 divide-y divide-line">

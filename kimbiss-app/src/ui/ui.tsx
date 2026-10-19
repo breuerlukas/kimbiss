@@ -1,4 +1,5 @@
-import { useEffect, useRef, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from "react";
+import i18n from "i18next";
+import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ChangeEvent, type InputHTMLAttributes, type ReactNode } from "react";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "quiet" | "danger";
@@ -89,12 +90,45 @@ export function Sheet({ open, onClose, children }: SheetProps) {
   );
 }
 
-/** Text for a number input: empty instead of 0 or NaN while typing. */
-export function numberText(value: number | undefined): string {
-  return value === undefined || Number.isNaN(value) ? "" : String(value);
+type NumberProps = { value: number | undefined; onValue: (value: number | undefined) => void };
+type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange">;
+
+/** A Field for a number, typed with a decimal comma or point. */
+export function NumberField({ value, onValue, ...props }: Omit<FieldProps, "value" | "onChange"> & NumberProps) {
+  return <Field inputMode="decimal" {...props} {...useNumberText({ value, onValue })} />;
 }
 
-export function parseNumber(text: string): number | undefined {
+/** A bare input for a number, typed with a decimal comma or point. */
+export function NumberInput({ value, onValue, ...props }: InputProps & NumberProps) {
+  return <input inputMode="decimal" {...props} {...useNumberText({ value, onValue })} />;
+}
+
+/**
+ * Keeps what was typed ("72," or "72,0") as long as it still means the value,
+ * so a comma is not wiped out the moment it is typed. A value set from outside
+ * (a reset, a new estimate) replaces the text.
+ */
+function useNumberText({ value, onValue }: NumberProps) {
+  const [text, setText] = useState(() => numberText(value));
+  if (text !== numberText(value) && parseNumber(text) !== value) {
+    setText(numberText(value));
+  }
+  return {
+    value: text,
+    onChange: (event: ChangeEvent<HTMLInputElement>) => {
+      setText(event.target.value);
+      onValue(parseNumber(event.target.value));
+    },
+  };
+}
+
+/** Empty instead of 0 or NaN, with the language's decimal mark (72,5 in German). */
+function numberText(value: number | undefined): string {
+  return value === undefined || Number.isNaN(value) ? ""
+    : value.toLocaleString(i18n.language, { useGrouping: false, maximumFractionDigits: 3 });
+}
+
+function parseNumber(text: string): number | undefined {
   const parsed = parseFloat(text.replace(",", "."));
   return Number.isNaN(parsed) ? undefined : parsed;
 }
