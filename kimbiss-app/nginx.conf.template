@@ -5,8 +5,15 @@ server {
   # Photos travel as base64 JSON; a 1280 px JPEG stays well under this.
   client_max_body_size 4m;
 
+  # Docker's DNS, asked per request: the auto deploy recreates the api
+  # container, which may get a new IP, and a proxy_pass with a fixed host
+  # keeps the one from startup (502). With a variable nginx resolves at
+  # request time and passes the original URI (/v1/...) unchanged.
+  resolver 127.0.0.11 valid=10s ipv6=off;
+  set $api_url ${API_URL};
+
   location /v1/ {
-    proxy_pass ${API_URL}/v1/;
+    proxy_pass $api_url;
     proxy_set_header Host $host;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
