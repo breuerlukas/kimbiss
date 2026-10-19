@@ -16,14 +16,26 @@ updates:
       gradle:
         patterns: ["*"]
         update-types: [minor, patch]
+  # Node and the JDK alternate long-term releases with short-lived ones, so
+  # the move to the next LTS is made by hand.
   - package-ecosystem: docker
     directories: [/kimbiss-api, /kimbiss-app]
     schedule:
       interval: weekly
+    ignore:
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
+      - dependency-name: eclipse-temurin
+        update-types: ["version-update:semver-major"]
+  # A Postgres major cannot start on the old data directory: dump, new
+  # volume, restore, by hand.
   - package-ecosystem: docker-compose
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      - dependency-name: postgres
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
