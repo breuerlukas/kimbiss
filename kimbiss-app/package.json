@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "check": "tsx src/setup/targets.check.ts && tsx src/locales/locales.check.ts"
+    "check": "tsx src/setup/targets.check.ts && tsx src/locales/locales.check.ts && tsx src/meal/contours.check.ts"
   },
   "dependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",
