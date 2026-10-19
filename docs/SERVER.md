@@ -8,14 +8,22 @@ volumes, and hard memory and CPU limits, so it can't starve its neighbours.
 
 ## 1. Start Kimbiss on the server
 
+The server builds nothing. CI publishes `ghcr.io/breuerlukas/kimbiss-api` and
+`ghcr.io/breuerlukas/kimbiss-app` on every push to `main`, and the server pulls
+them. The checkout lives in `/home/kimbiss`, owned by the user `kimbiss`, who is
+in the `docker` group.
+
 ```bash
-git clone https://github.com/breuerlukas/kimbiss.git && cd kimbiss
+git clone https://github.com/breuerlukas/kimbiss.git /home/kimbiss && cd /home/kimbiss
 cp .env.example .env    # POSTGRES_PASSWORD, KIMBISS_INVITE_CODE, CLAUDE_CODE_OAUTH_TOKEN, KIMBISS_DOMAIN
-docker compose -f docker-compose.yml -f docker-compose.server.yml up -d --build
+echo "COMPOSE_FILE=docker-compose.yml:docker-compose.server.yml" >> .env
+docker compose pull && docker compose up -d
 ```
 
-Check first that 8088 and 8443 are free (`ss -ltn`); otherwise pick others
-with `KIMBISS_HTTP_PORT` and `KIMBISS_HTTPS_PORT`.
+With `COMPOSE_FILE` in `.env`, every `docker compose` in this folder uses the
+server setup without `-f`. Check first that 8088 and 8443 are free
+(`ss -ltn`); otherwise pick others with `KIMBISS_HTTP_PORT` and
+`KIMBISS_HTTPS_PORT`.
 
 ## 2. Route the domain at the edge proxy
 
@@ -56,3 +64,71 @@ so it has to be there.
 Caddy requests the certificate on its first start, once DNS for the domain
 points at the edge and the routes above are live. If it started earlier, it
 retries on its own; `docker compose logs caddy` shows the progress.
+
+## 4. Automatic deployment
+
+A merge to `main` reaches the server by itself within about five minutes, the
+same way as Insulink:
+
+1. CI (`.github/workflows/ci.yml`) builds and tests api and app, then pushes
+   both images as `:latest` and `:sha-<commit>`.
+2. A systemd timer on the server (`deploy/kimbiss-update.timer`) runs every five
+   minutes: `git pull --ff-only` (so compose and Caddyfile changes arrive too),
+   `docker compose pull api app caddy`, `docker compose up -d`, a Caddy reload,
+   and a prune of old images. Compose only restarts a container whose image or
+   configuration changed.
+
+Pull instead of push: GitHub holds no SSH key and no way into the server; a
+compromised workflow can at worst publish a bad image. Postgres is never
+pulled, its major version changes only by hand (dump, new volume, restore).
+
+### Set it up once
+
+1. **Make the images public.** After the first CI run on `main`, open both
+   packages on GitHub (profile, Packages, `kimbiss-api` and `kimbiss-app`,
+   Package settings) and change the visibility to public. A first push creates
+   them private, and the server would need `docker login ghcr.io` otherwise.
+   They hold no secrets: those come from `.env`.
+2. **Back up the database:**
+   ```bash
+   cd /home/kimbiss
+   docker compose -f docker-compose.yml -f docker-compose.server.yml exec postgres \
+     pg_dump -U postgres kimbiss > ~/kimbiss-backup.sql
+   ```
+3. **Check the volume name.** `docker volume ls` must show `kimbiss_pgdata`.
+   Compose now pins the project name `kimbiss`; a folder of another name used
+   to give another prefix. If it shows something else, stop here and change
+   `name:` in `docker-compose.yml` to that prefix first, or Postgres starts on an
+   empty volume.
+4. **Switch to the images:**
+   ```bash
+   git pull --ff-only
+   echo "COMPOSE_FILE=docker-compose.yml:docker-compose.server.yml" >> .env
+   docker compose pull && docker compose up -d
+   docker compose ps          # postgres, api, app, caddy all up
+   ```
+5. **Install the timer:**
+   ```bash
+   sudo cp deploy/kimbiss-update.* /etc/systemd/system/
+   sudo systemctl daemon-reload
+   sudo systemctl enable --now kimbiss-update.timer
+   ```
+   The unit runs as user `kimbiss` in `/home/kimbiss`. For another user or
+   folder, edit `User=` and `WorkingDirectory=` in the copy under
+   `/etc/systemd/system/`, then `daemon-reload` again.
+6. **Check it:**
+   ```bash
+   systemctl list-timers kimbiss-update.timer       # next run
+   sudo systemctl start kimbiss-update.service      # one run right now
+   journalctl -u kimbiss-update.service -n 50       # what it did
+   ```
+
+Leave the tracked files on the server alone: a local edit makes
+`git pull --ff-only` fail, and the run stops before touching any container
+(`git status` shows the culprit, `git checkout -- <file>` drops it). Server
+settings belong in `.env`.
+
+To roll back, revert the commit on `main`; the timer deploys that. In a hurry:
+`sudo systemctl stop kimbiss-update.timer`, then
+`docker tag ghcr.io/breuerlukas/kimbiss-api:sha-<commit> ghcr.io/breuerlukas/kimbiss-api:latest`
+and `docker compose up -d`; start the timer again once `main` is fixed.

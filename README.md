@@ -28,7 +28,8 @@ HTTPS.
 **On the iPhone:** open the URL in Safari, Share, *Add to Home Screen*.
 
 **On a shared server:** `docs/SERVER.md` runs it with its own TLS on its own
-ports, without touching anything else on the host.
+ports, without touching anything else on the host, and pulls every merge to
+`main` by itself within five minutes.
 
 ## Who may use it
 
