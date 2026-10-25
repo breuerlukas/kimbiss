@@ -1,10 +1,11 @@
-# Runs kimbiss-update.service every five minutes.
+# Runs kimbiss-update.service every five minutes, by the clock: a timer on
+# OnUnitActiveSec schedules nothing more once a run has failed ("Trigger:
+# n/a"), so one bad pull stopped every later update.
 [Unit]
 Description=Update Kimbiss every five minutes
 
 [Timer]
-OnBootSec=2min
-OnUnitActiveSec=5min
+OnCalendar=*:0/5
 
 [Install]
 WantedBy=timers.target

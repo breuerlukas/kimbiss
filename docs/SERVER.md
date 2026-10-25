@@ -74,7 +74,9 @@ same way as Insulink:
    both images as `:latest` and `:sha-<commit>`.
 2. A systemd timer on the server (`deploy/kimbiss-update.timer`) runs every five
    minutes: `git pull --ff-only` (so compose and Caddyfile changes arrive too),
-   `docker compose pull api app caddy`, `docker compose up -d`, a Caddy reload,
+   `docker compose pull` for api, app and caddy one after the other (in
+   parallel, images sharing a layer race in containerd and the pull fails),
+   `docker compose up -d`, a Caddy reload,
    and a prune of old images. Compose only restarts a container whose image or
    configuration changed.
 
@@ -116,6 +118,9 @@ pulled, its major version changes only by hand (dump, new volume, restore).
    The unit runs as user `kimbiss` in `/home/kimbiss`. For another user or
    folder, edit `User=` and `WorkingDirectory=` in the copy under
    `/etc/systemd/system/`, then `daemon-reload` again.
+   After a change to the units in `deploy/`, copy them again, then
+   `sudo systemctl daemon-reload && sudo systemctl restart kimbiss-update.timer`.
+   A drop-in under `kimbiss-update.service.d/` survives the copy.
 6. **Check it:**
    ```bash
    systemctl list-timers kimbiss-update.timer       # next run
