@@ -50,7 +50,7 @@ export function NutrientStrip({ values, onChange }: StripProps) {
   );
 }
 
-/** The foods the photo showed, one row each: name over weight, kcal right. */
+/** The foods the photo showed, one row each: name over weight and macros, kcal right. */
 export function EstimateItems({ items }: { items: EstimateItem[] }) {
   const { t } = useTranslation();
   return (
@@ -64,7 +64,9 @@ export function EstimateItems({ items }: { items: EstimateItem[] }) {
           <li key={position} className="flex items-center gap-3 px-4 py-3">
             <span className="min-w-0 flex-1">
               <span className="block truncate font-semibold">{item.name}</span>
-              <span className="text-sm text-ink-soft">{formatNumber(item.grams)} g</span>
+              <span className="block truncate text-sm text-ink-soft">
+                {formatNumber(item.grams)} g, {formatNumber(item.protein)} g {t("macros.protein")}, {formatNumber(item.carbs)} g {t("macros.carbs_short")}, {formatNumber(item.fat)} g {t("macros.fat")}
+              </span>
             </span>
             <span className="font-semibold">{formatNumber(item.kcal)} <span className="text-sm font-normal text-ink-soft">kcal</span></span>
           </li>

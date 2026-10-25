@@ -7,7 +7,7 @@ import { AnalysingOverlay } from "./AnalysingOverlay.tsx";
 import { estimateMeal, type Estimate } from "./meals.ts";
 import { photoToJpegBase64 } from "./photo.ts";
 
-type PhotoButtonProps = { onEstimate: (estimate: Estimate, photoUrl: string) => void; onManual: () => void };
+type PhotoButtonProps = { onEstimate: (estimate: Estimate, photoUrl: string, photo: string) => void; onManual: () => void };
 
 /**
  * The main action opens the camera straight away (`capture`; without it
@@ -33,12 +33,13 @@ export function PhotoButton({ onEstimate, onManual }: PhotoButtonProps) {
     setPhotoUrl(url);
     setError(undefined);
     try {
-      const result = await estimateMeal(await photoToJpegBase64(file), i18n.language);
+      const photo = await photoToJpegBase64(file);
+      const result = await estimateMeal(photo, i18n.language);
       if (result.items.length === 0) {
         setError("no_food");
         return;
       }
-      onEstimate(result, url);
+      onEstimate(result, url, photo);
       keepPhoto = true;
     } catch (failure) {
       setError(errorCode(failure));

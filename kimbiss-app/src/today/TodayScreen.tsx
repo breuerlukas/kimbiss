@@ -72,7 +72,7 @@ export function TodayScreen({ profile }: { profile: Profile }) {
         </>
       )}
       <div className="fixed inset-x-0 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] mx-auto max-w-lg px-5">
-        <PhotoButton onEstimate={(estimate, photoUrl) => setDraft({ estimate, photoUrl })} onManual={() => setDraft({})} />
+        <PhotoButton onEstimate={(estimate, photoUrl, photo) => setDraft({ estimate, photoUrl, photo })} onManual={() => setDraft({})} />
       </div>
       <MealSheet draft={draft} day={day} onClose={closeSheet}
         onSaved={() => {
