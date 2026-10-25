@@ -21,16 +21,18 @@
     "name_taken": "That name is taken. Pick another one.",
     "wrong_credentials": "Name or password is wrong.",
     "too_many_attempts": "Too many attempts. Try again in 15 minutes.",
-    "network": "Can't reach the server. Check your connection.",
     "unknown": "That didn't work. Try again.",
     "estimate_limit": "All photo estimates for today are used up. Add the meal by hand.",
     "estimate_unavailable": "The photo couldn't be read right now. Try again in a moment or add it by hand.",
     "invalid_image": "That image can't be used. Take another photo.",
     "no_food": "There is no food to see in that photo.",
     "save_failed": "Saving didn't work. Try again.",
-    "load_failed": "Loading didn't work. Check your connection.",
+    "load_failed": "Loading didn't work. Try again.",
     "invalid_name": "The name needs 3 to 32 characters, such as letters, digits and spaces.",
-    "invalid_password": "The password needs at least 8 characters."
+    "invalid_password": "The password needs at least 8 characters.",
+    "offline": "You're offline. Check your Wi-Fi or mobile data.",
+    "unreachable": "The Kimbiss server can't be reached right now. Your internet works, try again in a moment.",
+    "server_error": "Something went wrong on the server, not on your side. Try again in a moment."
   },
   "setup": {
     "progress": "Step {{step}} of {{total}}",

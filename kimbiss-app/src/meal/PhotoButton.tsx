@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { Camera, Image, Plus } from "lucide-react";
-import { ApiError } from "../api/client.ts";
+import { errorCode } from "../api/client.ts";
 import { AnalysingOverlay } from "./AnalysingOverlay.tsx";
 import { estimateMeal, type Estimate } from "./meals.ts";
 import { photoToJpegBase64 } from "./photo.ts";
@@ -41,7 +41,7 @@ export function PhotoButton({ onEstimate, onManual }: PhotoButtonProps) {
       onEstimate(result, url);
       keepPhoto = true;
     } catch (failure) {
-      setError(failure instanceof ApiError ? failure.code : "network");
+      setError(errorCode(failure));
     } finally {
       if (!keepPhoto) {
         URL.revokeObjectURL(url);

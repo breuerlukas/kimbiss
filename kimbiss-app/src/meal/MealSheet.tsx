@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react";
+import { errorCode } from "../api/client.ts";
 import { Button, Sheet } from "../ui/ui.tsx";
 import { EstimateItems, MealHeader, NutrientStrip, type Nutrient } from "./MealParts.tsx";
 import { deleteMeal, saveMeal, type Estimate, type Meal } from "./meals.ts";
@@ -30,18 +31,18 @@ function MealForm({ draft, day, onClose, onSaved }: Omit<MealSheetProps, "draft"
   const { t } = useTranslation();
   const [values, setValues] = useState<Values>(() => initialValues(draft));
   const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [error, setError] = useState<string>();
   const change = (patch: Partial<Values>) => setValues({ ...values, ...patch });
   const valid = values.name.trim() !== "" && values.kcal !== undefined;
 
   async function run(action: () => Promise<unknown>) {
     setBusy(true);
-    setFailed(false);
+    setError(undefined);
     try {
       await action();
       onSaved();
-    } catch {
-      setFailed(true);
+    } catch (failure) {
+      setError(errorCode(failure));
     } finally {
       setBusy(false);
     }
@@ -66,7 +67,7 @@ function MealForm({ draft, day, onClose, onSaved }: Omit<MealSheetProps, "draft"
         onName={(name) => change({ name })} onTime={(time) => change({ time })} />
       <NutrientStrip values={values} onChange={(nutrient, value) => change({ [nutrient]: value })} />
       {draft.estimate && <EstimateItems items={draft.estimate.items} />}
-      {failed && <p role="alert" className="text-danger">{t("errors.save_failed")}</p>}
+      {error && <p role="alert" className="text-danger">{t(`errors.${error}`, t("errors.save_failed"))}</p>}
       <Button type="submit" disabled={busy || !valid}>{t("common.save")}</Button>
       <div className="flex justify-center gap-6">
         <button type="button" onClick={onClose} className="h-10 text-ink-soft">{t("common.cancel")}</button>

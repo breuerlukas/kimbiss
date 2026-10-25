@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react";
+import { errorCode } from "../api/client.ts";
 import { useLoad } from "../api/use-load.ts";
 import { formatDate, formatNumber } from "../locales/format.ts";
 import type { Profile } from "../profile/profile.ts";
@@ -13,15 +14,26 @@ export function WeightScreen({ profile }: { profile: Profile }) {
   const { t } = useTranslation();
   const weights = useLoad(findWeights, "weights");
   const [kg, setKg] = useState<number>();
+  const [error, setError] = useState<string>();
   const entries = weights.data ?? [];
   const latest = entries[entries.length - 1];
 
-  async function submit(event: FormEvent) {
-    event.preventDefault();
-    await addWeight(kg!);
-    setKg(undefined);
-    weights.reload();
+  async function run(action: () => Promise<unknown>) {
+    setError(undefined);
+    try {
+      await action();
+      weights.reload();
+    } catch (failure) {
+      setError(errorCode(failure));
+    }
   }
+
+  function submit(event: FormEvent) {
+    event.preventDefault();
+    run(() => addWeight(kg!).then(() => setKg(undefined)));
+  }
+
+  const shownError = error ?? weights.error;
 
   return (
     <div>
@@ -37,6 +49,7 @@ export function WeightScreen({ profile }: { profile: Profile }) {
         <NumberField className="flex-1" label={t("weight.today")} unit="kg" value={kg} onValue={setKg} />
         <Button type="submit" disabled={kg === undefined || kg < 30 || kg > 300}>{t("common.save")}</Button>
       </form>
+      {shownError && <p role="alert" className="mt-3 text-danger">{t(`errors.${shownError}`, t("errors.unknown"))}</p>}
       <ul className="mt-8 divide-y divide-line">
         {[...entries].reverse().map((entry) => (
           <li key={entry.id} className="flex items-center justify-between py-2">
@@ -44,7 +57,7 @@ export function WeightScreen({ profile }: { profile: Profile }) {
             <span className="flex items-center gap-2">
               <span className="font-semibold">{formatNumber(entry.kg, 1)} kg</span>
               <button type="button" aria-label={t("weight.delete")} className="p-2 text-ink-soft"
-                onClick={() => deleteWeight(entry.id).then(weights.reload)}>
+                onClick={() => run(() => deleteWeight(entry.id))}>
                 <Trash2 size={18} aria-hidden />
               </button>
             </span>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChartLine, ReceiptText, UserRound } from "lucide-react";
-import { session } from "./api/client.ts";
+import { errorCode, session } from "./api/client.ts";
 import { AuthScreen } from "./auth/AuthScreen.tsx";
 import { findProfile, type Profile } from "./profile/profile.ts";
 import { ProfileScreen } from "./profile/ProfileScreen.tsx";
@@ -27,25 +27,25 @@ export function App() {
   const [profile, setProfile] = useState<Profile | null>();
   const [rerunSetup, setRerunSetup] = useState(false);
   const [tab, setTab] = useState<Tab>("today");
-  const [loadFailed, setLoadFailed] = useState(false);
+  const [loadError, setLoadError] = useState<string>();
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => session.onSignedOut(() => setSignedIn(false)), []);
   useEffect(() => {
     setProfile(undefined);
-    setLoadFailed(false);
+    setLoadError(undefined);
     if (signedIn) {
-      findProfile().then(setProfile, () => setLoadFailed(true));
+      findProfile().then(setProfile, (failure) => setLoadError(errorCode(failure)));
     }
   }, [signedIn, attempt]);
 
   if (!signedIn) {
     return <AuthScreen onSignedIn={() => setSignedIn(true)} />;
   }
-  if (loadFailed) {
+  if (loadError) {
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center gap-4 px-6 text-center">
-        <p>{t("errors.load_failed")}</p>
+        <p>{t(`errors.${loadError}`, t("errors.load_failed"))}</p>
         <Button variant="quiet" onClick={() => setAttempt(attempt + 1)}>{t("common.retry")}</Button>
       </main>
     );

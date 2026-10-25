@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { api, ApiError, session } from "../api/client.ts";
+import { api, errorCode, session } from "../api/client.ts";
 import { Button, Field } from "../ui/ui.tsx";
 
 type Mode = "signin" | "signup";
@@ -25,7 +25,7 @@ export function AuthScreen({ onSignedIn }: { onSignedIn: () => void }) {
       session.save(token);
       onSignedIn();
     } catch (failure) {
-      setError(failure instanceof ApiError ? failure.code : "network");
+      setError(errorCode(failure));
     } finally {
       setBusy(false);
     }

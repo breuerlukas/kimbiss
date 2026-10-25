@@ -57,9 +57,9 @@ export function TodayScreen({ profile }: { profile: Profile }) {
           <IconButton label={t("today.next_day")} onClick={() => shiftDay(1)} disabled={isToday}><ChevronRight /></IconButton>
         </div>
       </header>
-      {meals.failed && (
+      {meals.error && (
         <div role="alert" className="mb-4 flex items-center justify-between gap-3">
-          <p className="text-danger">{t("errors.load_failed")}</p>
+          <p className="text-danger">{t(`errors.${meals.error}`, t("errors.load_failed"))}</p>
           <Button variant="quiet" onClick={meals.reload}>{t("common.retry")}</Button>
         </div>
       )}
