@@ -4,7 +4,8 @@
     "next": "Weiter",
     "cancel": "Abbrechen",
     "save": "Speichern",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "close": "Schließen"
   },
   "auth": {
     "tagline": "Dein Essenstagebuch. Foto machen, fertig.",
@@ -129,6 +130,11 @@
     "take": "Foto machen",
     "gallery": "Foto aus der Galerie wählen",
     "analysing": "Wird analysiert",
+    "shutter": "Auslösen",
+    "light": "Licht",
+    "gallery_short": "Galerie",
+    "no_camera": "Die Kamera lässt sich nicht öffnen. Erlaube Kimbiss den Kamerazugriff in den Einstellungen oder nimm die Kamera-App.",
+    "camera_app": "Kamera-App öffnen",
     "step": {
       "looking": "Schaue mir das Foto an",
       "searching": "Suche online: {{detail}}",

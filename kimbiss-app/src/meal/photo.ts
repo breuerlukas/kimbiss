@@ -7,7 +7,7 @@ const QUALITY = 0.8;
  * createImageBitmap also turns an iPhone HEIC into pixels and applies the
  * EXIF rotation.
  */
-export async function photoToJpegBase64(file: File): Promise<string> {
+export async function photoToJpegBase64(file: Blob): Promise<string> {
   const bitmap = await createImageBitmap(file);
   const scale = Math.min(1, LONG_EDGE / Math.max(bitmap.width, bitmap.height));
   const canvas = document.createElement("canvas");

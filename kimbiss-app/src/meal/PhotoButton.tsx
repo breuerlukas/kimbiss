@@ -4,16 +4,18 @@ import { useTranslation } from "react-i18next";
 import { Camera, Image, Plus } from "lucide-react";
 import { errorCode } from "../api/client.ts";
 import { AnalysingOverlay } from "./AnalysingOverlay.tsx";
+import { MealCamera } from "./MealCamera.tsx";
 import { estimateMeal, type Estimate } from "./meals.ts";
 import { photoToJpegBase64 } from "./photo.ts";
 
 type PhotoButtonProps = { onEstimate: (estimate: Estimate, photoUrl: string, photo: string) => void; onManual: () => void };
 
 /**
- * The main action opens the camera straight away (`capture`; without it
- * Android opens the gallery). A photo taken earlier comes from the gallery
- * button, a meal without photo from the plus. Either photo is shrunk and the
- * api asked what is on the plate.
+ * The main action opens Kimbiss' own camera ({@link MealCamera}); where it
+ * cannot open, the system camera (`capture`; without it Android opens the
+ * gallery). A photo taken earlier comes from the gallery, a meal without photo
+ * from the plus. Either photo is shrunk and the api asked what is on the
+ * plate. A failed try shows its error in the camera, if it is open, else here.
  */
 export function PhotoButton({ onEstimate, onManual }: PhotoButtonProps) {
   const { t, i18n } = useTranslation();
@@ -22,12 +24,22 @@ export function PhotoButton({ onEstimate, onManual }: PhotoButtonProps) {
   const [photoUrl, setPhotoUrl] = useState<string>();
   const busy = photoUrl !== undefined;
   const [error, setError] = useState<string>();
+  const [camera, setCamera] = useState(false);
 
-  async function estimate(input: HTMLInputElement) {
+  function closeCamera() {
+    setCamera(false);
+    setError(undefined);
+  }
+
+  async function estimateFile(input: HTMLInputElement) {
     const file = input.files?.[0];
-    if (!file) {
-      return;
+    input.value = "";
+    if (file) {
+      await estimate(file);
     }
+  }
+
+  async function estimate(file: Blob) {
     const url = URL.createObjectURL(file);
     let keepPhoto = false;
     setPhotoUrl(url);
@@ -41,6 +53,7 @@ export function PhotoButton({ onEstimate, onManual }: PhotoButtonProps) {
       }
       onEstimate(result, url, photo);
       keepPhoto = true;
+      setCamera(false);
     } catch (failure) {
       setError(errorCode(failure));
     } finally {
@@ -48,16 +61,27 @@ export function PhotoButton({ onEstimate, onManual }: PhotoButtonProps) {
         URL.revokeObjectURL(url);
       }
       setPhotoUrl(undefined);
-      input.value = "";
     }
   }
 
   return (
     <div>
+      {camera && createPortal(
+        <MealCamera error={error} onShot={estimate} onClose={closeCamera}
+          onGallery={() => galleryInput.current?.click()}
+          onCameraApp={() => {
+            closeCamera();
+            cameraInput.current?.click();
+          }} />,
+        document.body,
+      )}
       {photoUrl && createPortal(<AnalysingOverlay photoUrl={photoUrl} />, document.body)}
-      {error && <p role="alert" className="mb-2 text-center text-danger">{t(`errors.${error}`, t("errors.unknown"))}</p>}
+      {error && !camera && <p role="alert" className="mb-2 text-center text-danger">{t(`errors.${error}`, t("errors.unknown"))}</p>}
       <div className="flex gap-3">
-        <button type="button" disabled={busy} onClick={() => cameraInput.current?.click()}
+        <button type="button" disabled={busy} onClick={() => {
+          setError(undefined);
+          setCamera(true);
+        }}
           className="flex h-16 min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl bg-accent text-base font-bold text-accent-ink transition active:scale-[0.98] active:brightness-95 disabled:opacity-70">
           <Camera aria-hidden className="shrink-0" />
           <span className="truncate">{t("photo.take")}</span>
@@ -70,9 +94,9 @@ export function PhotoButton({ onEstimate, onManual }: PhotoButtonProps) {
         </SideButton>
       </div>
       <input ref={cameraInput} type="file" accept="image/*" capture="environment" hidden
-        onChange={(event) => estimate(event.target)} />
+        onChange={(event) => estimateFile(event.target)} />
       <input ref={galleryInput} type="file" accept="image/*" hidden
-        onChange={(event) => estimate(event.target)} />
+        onChange={(event) => estimateFile(event.target)} />
     </div>
   );
 }

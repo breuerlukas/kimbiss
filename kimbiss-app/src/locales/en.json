@@ -4,7 +4,8 @@
     "next": "Next",
     "cancel": "Cancel",
     "save": "Save",
-    "retry": "Try again"
+    "retry": "Try again",
+    "close": "Close"
   },
   "auth": {
     "tagline": "Your food diary. Snap a photo, done.",
@@ -129,6 +130,11 @@
     "take": "Snap meal",
     "gallery": "Pick a photo from the gallery",
     "analysing": "Analysing",
+    "shutter": "Take photo",
+    "light": "Light",
+    "gallery_short": "Gallery",
+    "no_camera": "The camera won't open. Allow Kimbiss camera access in the settings, or use the camera app.",
+    "camera_app": "Open camera app",
     "step": {
       "looking": "Looking at the photo",
       "searching": "Searching online: {{detail}}",
