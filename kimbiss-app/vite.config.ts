@@ -59,8 +59,10 @@ export default defineConfig({
     }),
   ],
   server: {
+    // KIMBISS_API=https://kimbiss.lukasbreuer.de runs against production;
+    // changeOrigin sends its host, which Caddy needs to pick the site.
     proxy: {
-      "/v1": process.env.KIMBISS_API ?? "http://localhost:18080",
+      "/v1": { target: process.env.KIMBISS_API ?? "http://localhost:18080", changeOrigin: true },
     },
   },
 });
