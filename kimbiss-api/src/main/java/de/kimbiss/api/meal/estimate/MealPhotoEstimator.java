@@ -2,8 +2,10 @@ package de.kimbiss.api.meal.estimate;
 
 import lombok.RequiredArgsConstructor;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
@@ -11,6 +13,7 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * Runs the headless Claude Code CLI installed in the api container on one meal
@@ -23,16 +26,23 @@ import java.util.concurrent.TimeUnit;
  */
 @RequiredArgsConstructor(staticName = "create")
 public final class MealPhotoEstimator {
-  private static final long TIMEOUT_SECONDS = 60;
+  /** Room for a product lookup on the web. */
+  private static final long TIMEOUT_SECONDS = 120;
   private static final File WORKING_DIRECTORY =
     new File(System.getProperty("java.io.tmpdir"));
 
   private final ExecutorService queue = Executors.newSingleThreadExecutor();
 
-  /** The estimate, or a failed future when the CLI gave none in time. */
-  public CompletableFuture<MealEstimate> estimate(MealImage image, String language) {
+  /**
+   * The estimate, or a failed future when the CLI gave none in time. Each step
+   * the CLI reaches goes to {@code onStep} while it runs.
+   */
+  public CompletableFuture<MealEstimate> estimate(
+    MealImage image, String language, Consumer<MealEstimateStep> onStep
+  ) {
     var prompt = MealEstimatePrompt.create(image, language);
-    return CompletableFuture.supplyAsync(() -> run(prompt), queue)
+    var stream = MealEstimateStream.create(onStep);
+    return CompletableFuture.supplyAsync(() -> run(prompt, stream), queue)
       .thenApply(this::parse);
   }
 
@@ -46,10 +56,10 @@ public final class MealPhotoEstimator {
 
   /**
    * Starts the CLI, writes the photo message to its stdin and reads stdout to
-   * the end. A run past the timeout is killed, which closes the pipe and ends
+   * the end, line by line so {@code stream} sees each event as it comes. A run past the timeout is killed, which closes the pipe and ends
    * the read with whatever came so far.
    */
-  private String run(MealEstimatePrompt prompt) {
+  private String run(MealEstimatePrompt prompt, MealEstimateStream stream) {
     try {
       var process = new ProcessBuilder(prompt.command())
         .directory(WORKING_DIRECTORY)
@@ -58,11 +68,23 @@ public final class MealPhotoEstimator {
       CompletableFuture.delayedExecutor(TIMEOUT_SECONDS, TimeUnit.SECONDS)
         .execute(process::destroyForcibly);
       writeStdin(process, prompt.stdinLine());
-      return new String(process.getInputStream().readAllBytes(),
-        StandardCharsets.UTF_8);
+      return readStdout(process, stream);
     } catch (IOException exception) {
       throw new UncheckedIOException(exception);
     }
+  }
+
+  private String readStdout(Process process, MealEstimateStream stream)
+    throws IOException {
+    var stdout = new StringBuilder();
+    try (var reader = new BufferedReader(new InputStreamReader(
+      process.getInputStream(), StandardCharsets.UTF_8))) {
+      reader.lines().forEach(line -> {
+        stream.accept(line);
+        stdout.append(line).append('\n');
+      });
+    }
+    return stdout.toString();
   }
 
   private void writeStdin(Process process, String line) throws IOException {

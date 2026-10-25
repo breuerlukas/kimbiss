@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * The CLI must run without tools, so text in a photo cannot make it read the
+ * The CLI may only search the web, so text in a photo cannot make it read the
  * container's secrets. The schema must ask for the packaging and the piece
  * count before any weight, or the model skips them.
  */
@@ -18,10 +18,13 @@ final class MealEstimatePromptTest {
   }
 
   @Test
-  void theCliRunsWithoutToolsOnOpus() {
+  void theCliRunsWithWebSearchOnlyOnOpus() {
     var command = MealEstimatePrompt.create(MealImage.create(JPEG), "de").command();
-    Assertions.assertEquals("", command.get(command.indexOf("--tools") + 1));
-    Assertions.assertEquals("claude-opus-5-5", command.get(command.indexOf("--model") + 1));
+    Assertions.assertEquals("WebSearch", command.get(command.indexOf("--tools") + 1));
+    Assertions.assertEquals("WebSearch",
+      command.get(command.indexOf("--allowedTools") + 1));
+    Assertions.assertTrue(command.contains("--strict-mcp-config"));
+    Assertions.assertEquals("opus", command.get(command.indexOf("--model") + 1));
   }
 
   @Test

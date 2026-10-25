@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChartLine, ReceiptText, UserRound } from "lucide-react";
-import { session } from "./api/client.ts";
+import { errorCode, session } from "./api/client.ts";
 import { AuthScreen } from "./auth/AuthScreen.tsx";
 import { findProfile, type Profile } from "./profile/profile.ts";
 import { ProfileScreen } from "./profile/ProfileScreen.tsx";
@@ -19,7 +19,8 @@ const TABS = [
 
 /**
  * Signed out: sign-in. Signed in without a profile, or rerunning it: the setup
- * guide. Otherwise the three tabs.
+ * guide. Otherwise the three tabs, switched in Insulink's floating dock; the
+ * today tab puts its camera button into the slot beside it.
  */
 export function App() {
   const { t } = useTranslation();
@@ -27,25 +28,26 @@ export function App() {
   const [profile, setProfile] = useState<Profile | null>();
   const [rerunSetup, setRerunSetup] = useState(false);
   const [tab, setTab] = useState<Tab>("today");
-  const [loadFailed, setLoadFailed] = useState(false);
+  const [loadError, setLoadError] = useState<string>();
   const [attempt, setAttempt] = useState(0);
+  const [dockAction, setDockAction] = useState<HTMLElement | null>(null);
 
   useEffect(() => session.onSignedOut(() => setSignedIn(false)), []);
   useEffect(() => {
     setProfile(undefined);
-    setLoadFailed(false);
+    setLoadError(undefined);
     if (signedIn) {
-      findProfile().then(setProfile, () => setLoadFailed(true));
+      findProfile().then(setProfile, (failure) => setLoadError(errorCode(failure)));
     }
   }, [signedIn, attempt]);
 
   if (!signedIn) {
     return <AuthScreen onSignedIn={() => setSignedIn(true)} />;
   }
-  if (loadFailed) {
+  if (loadError) {
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center gap-4 px-6 text-center">
-        <p>{t("errors.load_failed")}</p>
+        <p>{t(`errors.${loadError}`, t("errors.load_failed"))}</p>
         <Button variant="quiet" onClick={() => setAttempt(attempt + 1)}>{t("common.retry")}</Button>
       </main>
     );
@@ -65,25 +67,31 @@ export function App() {
   return (
     <>
       <main className="mx-auto max-w-lg px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[calc(6rem+env(safe-area-inset-bottom))]">
-        {tab === "today" && <TodayScreen profile={profile} />}
+        {tab === "today" && <TodayScreen profile={profile} dockAction={dockAction} />}
         {tab === "weight" && <WeightScreen profile={profile} />}
         {tab === "profile" && (
           <ProfileScreen profile={profile} onRerunSetup={() => setRerunSetup(true)} onSignedOut={() => setSignedIn(false)} />
         )}
       </main>
-      <nav className="fixed inset-x-0 bottom-0 border-t border-line bg-paper/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
-        <ul className="mx-auto flex max-w-lg">
-          {TABS.map(({ id, icon: Icon }) => (
-            <li key={id} className="flex-1">
-              <button type="button" onClick={() => setTab(id)} aria-current={tab === id ? "page" : undefined}
-                className={`flex h-16 w-full flex-col items-center justify-center gap-0.5 text-xs ${tab === id ? "font-semibold text-ink" : "text-ink-soft"}`}>
-                <Icon size={22} aria-hidden strokeWidth={tab === id ? 2.5 : 2} />
-                {t(`tabs.${id}`)}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 bg-linear-to-t from-paper via-paper/80 to-transparent pt-6">
+        <div className="pointer-events-auto mx-auto flex max-w-lg items-center gap-3 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <nav className="h-[62px] flex-1 rounded-[31px] border border-rim bg-dock p-[7px] shadow-[0_8px_24px_rgb(29_21_38/0.14)]">
+            <ul className="flex h-full gap-1">
+              {TABS.map(({ id, icon: Icon }) => (
+                <li key={id} className={tab === id ? "flex-[2.2]" : "flex-1"}>
+                  <button type="button" onClick={() => setTab(id)} aria-current={tab === id ? "page" : undefined}
+                    aria-label={t(`tabs.${id}`)}
+                    className={`flex h-full w-full items-center justify-center gap-2 rounded-full font-bold transition-colors ${tab === id ? "bg-accent-soft text-accent-text" : "text-ink-soft"}`}>
+                    <Icon size={22} aria-hidden strokeWidth={tab === id ? 2.4 : 2} />
+                    {tab === id && <span className="truncate">{t(`tabs.${id}`)}</span>}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div ref={setDockAction} className="empty:hidden" />
+        </div>
+      </div>
     </>
   );
 }

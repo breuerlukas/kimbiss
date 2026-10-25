@@ -1,15 +1,4 @@
-import { api } from "../api/client.ts";
-
-export type MealInput = {
-  name: string;
-  eaten_at: number;
-  kcal: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-};
-
-export type Meal = MealInput & { id: string };
+import { api, apiImage } from "../api/client.ts";
 
 export type EstimateItem = {
   name: string;
@@ -19,6 +8,23 @@ export type EstimateItem = {
   carbs: number;
   fat: number;
 };
+
+/** `items` are the foods of a photo estimate; `photo` the base64 JPEG, sent only on the first save. */
+export type MealInput = {
+  name: string;
+  eaten_at: number;
+  kcal: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  items: EstimateItem[];
+  photo?: string;
+};
+
+export type Meal = Omit<MealInput, "photo"> & { id: string; has_photo: boolean };
+
+/** Where a running estimate is: `looking`, `searching` (the query as detail) or `estimating` (a food's name). */
+export type EstimateStep = { step?: string; detail?: string };
 
 export type Estimate = EstimateItem & { items: EstimateItem[] };
 
@@ -39,4 +45,13 @@ export function deleteMeal(id: string): Promise<void> {
 
 export function estimateMeal(image: string, language: string): Promise<Estimate> {
   return api("POST", "/meals/estimate", { image, language });
+}
+
+export function findEstimateStep(): Promise<EstimateStep> {
+  return api("GET", "/meals/estimate/progress");
+}
+
+/** The saved meal's photo as an object URL; the caller revokes it. */
+export function findMealPhoto(id: string): Promise<string> {
+  return apiImage(`/meals/${id}/photo`);
 }

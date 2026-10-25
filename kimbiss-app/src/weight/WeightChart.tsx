@@ -1,13 +1,14 @@
 import { useTranslation } from "react-i18next";
+import { formatNumber } from "../locales/format.ts";
 import type { WeightEntry } from "./weights.ts";
 
 const WIDTH = 320;
 const HEIGHT = 160;
-const PADDING = 12;
+const PADDING = 8;
 
 /**
- * The weighings as one line over time, with the goal weight dashed across.
- * Plain SVG: a single series needs no chart library.
+ * The weighings as one line over time, with the goal weight dashed across and
+ * named at its right end. Plain SVG: a single series needs no chart library.
  */
 export function WeightChart({ entries, goalKg }: { entries: WeightEntry[]; goalKg: number }) {
   const { t } = useTranslation();
@@ -24,11 +25,14 @@ export function WeightChart({ entries, goalKg }: { entries: WeightEntry[]; goalK
   const last = entries[entries.length - 1];
   return (
     <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={t("weight.chart_label")}>
-      <line x1={PADDING} x2={WIDTH - PADDING} y1={y(goalKg)} y2={y(goalKg)}
-        className="stroke-ink-soft" strokeDasharray="4 5" strokeWidth={1.5} />
+      <line x1={0} x2={WIDTH} y1={y(goalKg)} y2={y(goalKg)}
+        className="stroke-fat" strokeDasharray="3 4" strokeWidth={1.25} opacity={0.8} />
+      <text x={WIDTH} y={y(goalKg) - 6} textAnchor="end" className="fill-fat text-[11px] font-semibold">
+        {t("weight.goal_short", { kg: formatNumber(goalKg, 1) })}
+      </text>
       <polyline points={points} fill="none" className="stroke-accent" strokeWidth={3}
         strokeLinejoin="round" strokeLinecap="round" />
-      <circle cx={x(last.measured_at)} cy={y(last.kg)} r={6} className="fill-accent stroke-ink" strokeWidth={2} />
+      <circle cx={x(last.measured_at)} cy={y(last.kg)} r={6} className="fill-accent stroke-surface" strokeWidth={3} />
     </svg>
   );
 }

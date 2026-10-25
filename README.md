@@ -47,14 +47,24 @@ default:
 
 ## Photo estimate
 
-The api runs the Claude Code CLI headless per photo, with no tools, no MCP
-servers and no settings, so text inside a photo has nothing to call. The answer
-is schema-checked JSON with one item per food. Photos are not stored.
+The api runs the Claude Code CLI headless per photo, with web search as its
+only tool, no MCP servers and no settings: there is no file, shell or fetch
+tool, so text inside a photo cannot reach the server's secrets. The answer is
+schema-checked JSON with one item per food. A saved meal keeps its photo
+(`meal_photos`) and its foods, so both show again when the meal is opened.
 
 The prompt is Insulink's: the model first writes down what it can read on the
 packaging, then counts the pieces (slices, rolls, biscuits) one by one and only
-then weighs them, since a miscount is the costliest mistake. It runs on Opus
-5.5, which counts noticeably better than Sonnet; a run takes 5 to 30 seconds.
+then weighs them, since a miscount is the costliest mistake. A branded product
+whose packaging doesn't show its weight and nutrition is looked up with one web
+search. It runs on Opus, which counts noticeably better than Sonnet, and falls
+back to Sonnet when Opus is overloaded. A run takes 5 to 20 seconds, 30 to 60
+with a lookup; the CLI is killed after 120 s.
+
+While it runs, `GET /v1/meals/estimate/progress` answers the step the run is at
+(`looking`, `searching` with the query, `estimating` with a food's name), read
+off the CLI's stream as it arrives, and the app shows it under "Analysing". The
+model's own thinking is not shown.
 
 Sign-in token: run `claude setup-token` on any machine with a browser and put
 the token into `.env` as `CLAUDE_CODE_OAUTH_TOKEN`. It lasts about a year. For a

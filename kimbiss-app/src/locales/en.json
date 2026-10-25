@@ -4,7 +4,8 @@
     "next": "Next",
     "cancel": "Cancel",
     "save": "Save",
-    "retry": "Try again"
+    "retry": "Try again",
+    "close": "Close"
   },
   "auth": {
     "tagline": "Your food diary. Snap a photo, done.",
@@ -13,24 +14,28 @@
     "invite_code": "Invite code",
     "signin": "Sign in",
     "signup": "Create account",
-    "to_signup": "New here? Sign up with an invite code",
-    "to_signin": "Already have an account? Sign in"
+    "signup_question": "New here?",
+    "signup_action": "Sign up with an invite code",
+    "signin_question": "Have an account?",
+    "signin_action": "Sign in"
   },
   "errors": {
     "invalid_invite_code": "That invite code is not right.",
     "name_taken": "That name is taken. Pick another one.",
     "wrong_credentials": "Name or password is wrong.",
     "too_many_attempts": "Too many attempts. Try again in 15 minutes.",
-    "network": "Can't reach the server. Check your connection.",
     "unknown": "That didn't work. Try again.",
     "estimate_limit": "All photo estimates for today are used up. Add the meal by hand.",
     "estimate_unavailable": "The photo couldn't be read right now. Try again in a moment or add it by hand.",
     "invalid_image": "That image can't be used. Take another photo.",
     "no_food": "There is no food to see in that photo.",
     "save_failed": "Saving didn't work. Try again.",
-    "load_failed": "Loading didn't work. Check your connection.",
+    "load_failed": "Loading didn't work. Try again.",
     "invalid_name": "The name needs 3 to 32 characters, such as letters, digits and spaces.",
-    "invalid_password": "The password needs at least 8 characters."
+    "invalid_password": "The password needs at least 8 characters.",
+    "offline": "You're offline. Check your Wi-Fi or mobile data.",
+    "unreachable": "The Kimbiss server can't be reached right now. Your internet works, try again in a moment.",
+    "server_error": "Something went wrong on the server, not on your side. Try again in a moment."
   },
   "setup": {
     "progress": "Step {{step}} of {{total}}",
@@ -121,12 +126,25 @@
     "kcal": "Energy",
     "delete": "Delete meal",
     "recognized": "Seen in the photo",
-    "estimate_hint": "Estimated, please check"
+    "estimate_hint": "Estimated from the photo. Tap a number to correct it.",
+    "foods_one": "{{count}} food",
+    "foods_other": "{{count}} foods",
+    "item_detail": "{{grams}} g, {{protein}} g protein, {{carbs}} g carbs, {{fat}} g fat"
   },
   "photo": {
     "take": "Snap meal",
     "gallery": "Pick a photo from the gallery",
-    "analysing": "Analysing"
+    "analysing": "Analysing",
+    "shutter": "Take photo",
+    "light": "Light",
+    "gallery_short": "Gallery",
+    "no_camera": "The camera won't open. Allow Kimbiss camera access in the settings, or use the camera app.",
+    "camera_app": "Open camera app",
+    "step": {
+      "looking": "Looking at the photo",
+      "searching": "Searching online: {{detail}}",
+      "estimating": "Looking at {{detail}}"
+    }
   },
   "weight": {
     "title": "Progress",
@@ -134,7 +152,9 @@
     "today": "Weight today",
     "chart_empty": "From two entries on, your progress shows up here.",
     "chart_label": "Weight over time with goal weight",
-    "delete": "Delete entry"
+    "delete": "Delete entry",
+    "history": "Entries",
+    "goal_short": "Goal {{kg}} kg"
   },
   "profile": {
     "targets": "Your daily targets",

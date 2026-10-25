@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Profile } from "../profile/profile.ts";
 import { saveProfile } from "../profile/profile.ts";
+import { errorCode } from "../api/client.ts";
 import { Button } from "../ui/ui.tsx";
 import { addWeight } from "../weight/weights.ts";
 import { ActivityStep, BodyStep, PaceStep, stepDone, WeightStep, type Draft } from "./SetupSteps.tsx";
@@ -24,7 +25,7 @@ export function SetupGuide({ previous, onDone, onCancel }: GuideProps) {
   const [targets, setTargets] = useState<Targets>();
   const [index, setIndex] = useState(0);
   const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [error, setError] = useState<string>();
   const holding = draft.startWeightKg !== undefined && direction(draft as Answers) === 0;
   const steps: Step[] = ["body", "weight", "activity", ...(holding ? [] : ["pace" as const]), "summary"];
   const step = steps[index];
@@ -40,15 +41,15 @@ export function SetupGuide({ previous, onDone, onCancel }: GuideProps) {
 
   async function finish() {
     setBusy(true);
-    setFailed(false);
+    setError(undefined);
     try {
       const profile = await saveProfile(profileOf(draft as Answers, targets!));
       if (previous?.start_weight_kg !== profile.start_weight_kg) {
         await addWeight(profile.start_weight_kg);
       }
       onDone(profile);
-    } catch {
-      setFailed(true);
+    } catch (failure) {
+      setError(errorCode(failure));
     } finally {
       setBusy(false);
     }
@@ -73,7 +74,7 @@ export function SetupGuide({ previous, onDone, onCancel }: GuideProps) {
             change={(patch) => setTargets({ ...targets, ...patch })} />
         )}
       </div>
-      {failed && <p role="alert" className="mt-6 text-danger">{t("errors.save_failed")}</p>}
+      {error && <p role="alert" className="mt-6 text-danger">{t(`errors.${error}`, t("errors.save_failed"))}</p>}
       <div className="mt-8 flex gap-3">
         {(index > 0 || onCancel) && (
           <Button variant="quiet" onClick={() => (index > 0 ? setIndex(index - 1) : onCancel?.())}>
