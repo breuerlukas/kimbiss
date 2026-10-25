@@ -1,3 +1,5 @@
+import { API_CACHE } from "./cache.ts";
+
 const TOKEN_KEY = "kimbiss.token";
 
 /** A refusal from the api; `code` is its stable snake_case error key. */
@@ -17,7 +19,11 @@ let signedOutListener: () => void = () => {};
 export const session = {
   token: () => localStorage.getItem(TOKEN_KEY),
   save: (token: string) => localStorage.setItem(TOKEN_KEY, token),
-  clear: () => localStorage.removeItem(TOKEN_KEY),
+  /** Also drops the cached api answers, so the next account sees none of them. */
+  clear: () => {
+    localStorage.removeItem(TOKEN_KEY);
+    window.caches?.delete(API_CACHE).catch(() => undefined);
+  },
   /** Called when the api rejects the stored token, so the app shows sign-in. */
   onSignedOut: (listener: () => void) => {
     signedOutListener = listener;
@@ -29,7 +35,8 @@ export const session = {
  * failure is an {@link ApiError}, so the app can say what went wrong: `offline`
  * (the device has no network), `unreachable` (network, but no answer from the
  * server), `server_error` (the server or its proxy broke, no code of its own),
- * or the api's own code. Nothing is cached, so a change shows at once.
+ * or the api's own code. The browser caches nothing (the service worker keeps
+ * the last answers for offline only), so a change shows at once.
  */
 export async function api<T>(method: string, path: string, body?: unknown): Promise<T> {
   const response = await send(method, path, body);

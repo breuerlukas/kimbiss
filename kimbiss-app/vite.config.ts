@@ -2,12 +2,17 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
+import { API_CACHE } from "./src/api/cache.ts";
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
     VitePWA({
+      // Offline, yet a deploy shows on the next load: the page itself
+      // (index.html) comes from the network first and from the cache only
+      // offline, so it always names the newest hashed assets. Those are
+      // precached; a new worker takes over at once (autoUpdate), no reload.
       registerType: "autoUpdate",
       includeAssets: ["apple-touch-icon.png", "favicon.svg"],
       manifest: {
@@ -31,8 +36,25 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,woff2,png,svg}"],
-        navigateFallbackDenylist: [/^\/v1\//],
+        globPatterns: ["**/*.{js,css,woff2,png,svg}"],
+        navigateFallback: null,
+        cleanupOutdatedCaches: true,
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.mode === "navigate",
+            handler: "NetworkFirst",
+            options: { cacheName: "pages" },
+          },
+          // The last answers of the api, so the day, the weights and the
+          // profile still show offline. Online they are always fresh. The
+          // estimate progress is only worth anything live.
+          {
+            urlPattern: ({ url, request }) => request.method === "GET"
+              && url.pathname.startsWith("/v1/") && url.pathname !== "/v1/meals/estimate/progress",
+            handler: "NetworkFirst",
+            options: { cacheName: API_CACHE },
+          },
+        ],
       },
     }),
   ],

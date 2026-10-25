@@ -29,7 +29,10 @@ server {
     add_header Cache-Control "public, max-age=31536000, immutable";
   }
 
+  # index.html is asked again on every load (an ETag check), so a deploy
+  # shows at once; the assets it names are hashed and cache forever.
   location / {
+    add_header Cache-Control "no-cache";
     try_files $uri /index.html;
   }
 }
