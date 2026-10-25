@@ -128,7 +128,12 @@
   "photo": {
     "take": "Snap meal",
     "gallery": "Pick a photo from the gallery",
-    "analysing": "Analysing"
+    "analysing": "Analysing",
+    "step": {
+      "looking": "Looking at the photo",
+      "searching": "Searching online: {{detail}}",
+      "estimating": "Looking at {{detail}}"
+    }
   },
   "weight": {
     "title": "Progress",

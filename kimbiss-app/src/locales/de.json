@@ -128,7 +128,12 @@
   "photo": {
     "take": "Foto machen",
     "gallery": "Foto aus der Galerie wählen",
-    "analysing": "Wird analysiert"
+    "analysing": "Wird analysiert",
+    "step": {
+      "looking": "Schaue mir das Foto an",
+      "searching": "Suche online: {{detail}}",
+      "estimating": "Schaue mir {{detail}} an"
+    }
   },
   "weight": {
     "title": "Verlauf",

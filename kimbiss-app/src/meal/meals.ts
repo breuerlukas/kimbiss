@@ -23,6 +23,9 @@ export type MealInput = {
 
 export type Meal = Omit<MealInput, "photo"> & { id: string; has_photo: boolean };
 
+/** Where a running estimate is: `looking`, `searching` (the query as detail) or `estimating` (a food's name). */
+export type EstimateStep = { step?: string; detail?: string };
+
 export type Estimate = EstimateItem & { items: EstimateItem[] };
 
 /** Meals of the local day that `day` falls on, oldest first. */
@@ -42,6 +45,10 @@ export function deleteMeal(id: string): Promise<void> {
 
 export function estimateMeal(image: string, language: string): Promise<Estimate> {
   return api("POST", "/meals/estimate", { image, language });
+}
+
+export function findEstimateStep(): Promise<EstimateStep> {
+  return api("GET", "/meals/estimate/progress");
 }
 
 /** The saved meal's photo as an object URL; the caller revokes it. */
