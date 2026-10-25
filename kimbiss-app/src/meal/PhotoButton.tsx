@@ -1,23 +1,24 @@
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { Camera, Image, Plus } from "lucide-react";
+import { Camera } from "lucide-react";
 import { errorCode } from "../api/client.ts";
 import { AnalysingOverlay } from "./AnalysingOverlay.tsx";
 import { MealCamera } from "./MealCamera.tsx";
 import { estimateMeal, type Estimate } from "./meals.ts";
 import { photoToJpegBase64 } from "./photo.ts";
 
-type PhotoButtonProps = { onEstimate: (estimate: Estimate, photoUrl: string, photo: string) => void; onManual: () => void };
+type PhotoButtonProps = { onEstimate: (estimate: Estimate, photoUrl: string, photo: string) => void };
 
 /**
- * The main action opens Kimbiss' own camera ({@link MealCamera}); where it
- * cannot open, the system camera (`capture`; without it Android opens the
- * gallery). A photo taken earlier comes from the gallery, a meal without photo
- * from the plus. Either photo is shrunk and the api asked what is on the
- * plate. A failed try shows its error in the camera, if it is open, else here.
+ * The round camera button beside the dock, like Insulink's bolus button. It
+ * opens Kimbiss' own camera ({@link MealCamera}), which also offers the gallery
+ * and, where it cannot open, the system camera (`capture`; without it Android
+ * opens the gallery). Either photo is shrunk and the api asked what is on the
+ * plate. A failed try shows its error in the camera, if it is open, else in a
+ * banner over the dock.
  */
-export function PhotoButton({ onEstimate, onManual }: PhotoButtonProps) {
+export function PhotoButton({ onEstimate }: PhotoButtonProps) {
   const { t, i18n } = useTranslation();
   const cameraInput = useRef<HTMLInputElement>(null);
   const galleryInput = useRef<HTMLInputElement>(null);
@@ -65,7 +66,7 @@ export function PhotoButton({ onEstimate, onManual }: PhotoButtonProps) {
   }
 
   return (
-    <div>
+    <>
       {camera && createPortal(
         <MealCamera error={error} onShot={estimate} onClose={closeCamera}
           onGallery={() => galleryInput.current?.click()}
@@ -76,38 +77,23 @@ export function PhotoButton({ onEstimate, onManual }: PhotoButtonProps) {
         document.body,
       )}
       {photoUrl && createPortal(<AnalysingOverlay photoUrl={photoUrl} />, document.body)}
-      {error && !camera && <p role="alert" className="mb-2 text-center text-danger">{t(`errors.${error}`, t("errors.unknown"))}</p>}
-      <div className="flex gap-3">
-        <button type="button" disabled={busy} onClick={() => {
+      {error && !camera && (
+        <p role="alert" className="fixed inset-x-3 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] mx-auto max-w-md rounded-2xl bg-danger-soft px-4 py-3 text-center font-semibold text-danger backdrop-blur-md">
+          {t(`errors.${error}`, t("errors.unknown"))}
+        </p>
+      )}
+      <button type="button" disabled={busy} aria-label={t("photo.take")}
+        onClick={() => {
           setError(undefined);
           setCamera(true);
         }}
-          className="flex h-16 min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl bg-accent text-base font-bold text-accent-ink transition active:scale-[0.98] active:brightness-95 disabled:opacity-70">
-          <Camera aria-hidden className="shrink-0" />
-          <span className="truncate">{t("photo.take")}</span>
-        </button>
-        <SideButton label={t("photo.gallery")} disabled={busy} onClick={() => galleryInput.current?.click()}>
-          <Image aria-hidden />
-        </SideButton>
-        <SideButton label={t("meal.add")} onClick={onManual}>
-          <Plus aria-hidden />
-        </SideButton>
-      </div>
+        className="flex size-[62px] items-center justify-center rounded-full bg-accent text-accent-ink shadow-[0_8px_24px_rgb(29_21_38/0.18)] transition active:scale-95 disabled:opacity-60">
+        <Camera size={26} aria-hidden />
+      </button>
       <input ref={cameraInput} type="file" accept="image/*" capture="environment" hidden
         onChange={(event) => estimateFile(event.target)} />
       <input ref={galleryInput} type="file" accept="image/*" hidden
         onChange={(event) => estimateFile(event.target)} />
-    </div>
-  );
-}
-
-type SideButtonProps = { label: string; onClick: () => void; disabled?: boolean; children: React.ReactNode };
-
-function SideButton({ label, onClick, disabled, children }: SideButtonProps) {
-  return (
-    <button type="button" onClick={onClick} disabled={disabled} aria-label={label}
-      className="flex h-16 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-ink bg-surface disabled:opacity-50">
-      {children}
-    </button>
+    </>
   );
 }

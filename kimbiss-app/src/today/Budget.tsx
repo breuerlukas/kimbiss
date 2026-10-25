@@ -12,7 +12,8 @@ const MACROS = [
 ] as const;
 
 /**
- * What is left of today's energy as the headline, then one bar per macro.
+ * What is left of today's energy as the headline, open on the page like
+ * Insulink's glucose value, then the macros in one strip parted by lines.
  * Past the target the surplus turns red, with a plus, and so does the bar.
  */
 export function Budget({ meals, profile }: BudgetProps) {
@@ -22,23 +23,27 @@ export function Budget({ meals, profile }: BudgetProps) {
   const over = left < 0;
   return (
     <section aria-label={t("today.budget")}>
-      <p className={`text-7xl leading-none font-extrabold tracking-tighter ${over ? "text-danger" : ""}`}>
+      <p className={`text-[104px] leading-[0.82] font-extrabold tracking-[-0.055em] max-[360px]:text-[88px] ${over ? "text-danger" : ""}`}>
         {over && "+"}{formatNumber(Math.abs(left))}
       </p>
-      <p className={`mt-1 text-lg font-semibold ${over ? "text-danger" : ""}`}>{t(over ? "today.kcal_over" : "today.kcal_left")}</p>
-      <p className="text-ink-soft">
-        {t("today.of_target", { eaten: formatNumber(eaten), target: formatNumber(profile.kcal_target) })}
+      <p className="mt-4 flex flex-wrap items-baseline justify-between gap-x-3">
+        <span className={`font-bold ${over ? "text-danger" : ""}`}>{t(over ? "today.kcal_over" : "today.kcal_left")}</span>
+        <span className="text-sm text-ink-soft">
+          {t("today.of_target", { eaten: formatNumber(eaten), target: formatNumber(profile.kcal_target) })}
+        </span>
       </p>
-      <Bar share={eaten / profile.kcal_target} color={over ? "bg-danger" : "bg-accent"} className="mt-4 h-3" />
-      <dl className="mt-5 grid grid-cols-3 gap-3">
+      <Bar share={eaten / profile.kcal_target} color={over ? "bg-danger" : "bg-accent"} className="mt-3 h-2" />
+      <dl className="mt-6 grid grid-cols-3 divide-x divide-line rounded-[20px] border border-rim bg-surface py-4">
         {MACROS.map((macro) => {
           const grams = sum(meals, macro.key);
           const target = profile[`${macro.key}_target`];
           return (
-            <div key={macro.key}>
-              <dt className="truncate text-sm text-ink-soft">{t(`macros.${macro.key}`)}</dt>
-              <dd className="font-semibold whitespace-nowrap max-[380px]:text-sm">{formatNumber(grams)}<span className="font-normal text-ink-soft"> / {target} g</span></dd>
-              <Bar share={target ? grams / target : 0} color={macro.color} className="mt-1.5 h-1.5" />
+            <div key={macro.key} className="min-w-0 px-3.5">
+              <dt className="truncate text-[13px] text-ink-soft">{t(macro.key === "carbs" ? "macros.carbs_short" : `macros.${macro.key}`)}</dt>
+              <dd className="mt-0.5 text-xl font-extrabold whitespace-nowrap">
+                {formatNumber(grams)}<span className="text-sm font-semibold text-ink-soft"> / {target} g</span>
+              </dd>
+              <Bar share={target ? grams / target : 0} color={macro.color} className="mt-2 h-1.5" />
             </div>
           );
         })}

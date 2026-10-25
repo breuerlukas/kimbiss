@@ -2,7 +2,8 @@
 
 /* Lilac paper, aubergine ink and a violet accent (Kim's favourite colour):
    an Imbiss menu board, not a fitness dashboard. Macros keep one colour each
-   everywhere they appear. */
+   everywhere they appear. The structure is Insulink's: quiet panels with a
+   fine rim, lists in one panel, pill buttons, no shadows but the dock's. */
 :root {
   color-scheme: light dark;
   --paper: #f5f1fb;
@@ -16,6 +17,11 @@
   --carbs: #d49a12;
   --fat: #4f8f6b;
   --danger: #b8432b;
+  --rim: rgb(42 27 61 / 0.07);
+  --accent-soft: rgb(125 76 219 / 0.11);
+  --accent-text: #5a2fb5;
+  --danger-soft: rgb(184 67 43 / 0.1);
+  --dock: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -31,6 +37,11 @@
     --danger: #ef8a72;
     --accent: #b48cf7;
     --accent-ink: #1d1526;
+    --rim: rgb(243 238 247 / 0.07);
+    --accent-soft: rgb(180 140 247 / 0.16);
+    --accent-text: #d6c2fc;
+    --danger-soft: rgb(239 138 114 / 0.14);
+    --dock: #2f2440;
   }
 }
 
@@ -47,6 +58,11 @@
   --color-carbs: var(--carbs);
   --color-fat: var(--fat);
   --color-danger: var(--danger);
+  --color-rim: var(--rim);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-text: var(--accent-text);
+  --color-danger-soft: var(--danger-soft);
+  --color-dock: var(--dock);
 }
 
 html,
@@ -66,6 +82,11 @@ body {
 input,
 select {
   font-size: 16px;
+}
+
+/* The time sits in a line of text; the browser's clock icon is noise there. */
+input[type="time"]::-webkit-calendar-picker-indicator {
+  display: none;
 }
 
 /* Inputs show focus on their field frame instead. */

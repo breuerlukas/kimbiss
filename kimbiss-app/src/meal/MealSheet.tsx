@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react";
 import { errorCode } from "../api/client.ts";
+import { formatDate } from "../locales/format.ts";
 import { Button, Sheet } from "../ui/ui.tsx";
 import { EstimateItems, MealHeader, NutrientStrip, type Nutrient } from "./MealParts.tsx";
 import { deleteMeal, findMealPhoto, saveMeal, type Estimate, type Meal } from "./meals.ts";
@@ -70,24 +71,22 @@ function MealForm({ draft, day, onClose, onSaved }: Omit<MealSheetProps, "draft"
   }
 
   return (
-    <form onSubmit={submit} className="grid gap-4">
-      {draft.meal?.has_photo && savedPhotoUrl === undefined && <div className="h-48 w-full animate-pulse rounded-2xl bg-line" />}
-      {photoUrl && <img src={photoUrl} alt="" className="h-48 w-full rounded-2xl object-cover" />}
-      <MealHeader name={values.name} time={values.time}
+    <form onSubmit={submit} className="grid gap-5">
+      <MealHeader name={values.name} day={dayLabel(draft.meal ? new Date(draft.meal.eaten_at) : day, t("today.title"))}
+        time={values.time} onClose={onClose}
         onName={(name) => change({ name })} onTime={(time) => change({ time })} />
+      {draft.meal?.has_photo && savedPhotoUrl === undefined && <div className="aspect-[4/3] w-full animate-pulse rounded-[20px] bg-line" />}
+      {photoUrl && <img src={photoUrl} alt="" className="aspect-[4/3] w-full rounded-[20px] object-cover" />}
       <NutrientStrip values={values} onChange={(nutrient, value) => change({ [nutrient]: value })} />
-      {items.length > 0 && <EstimateItems items={items} />}
-      {error && <p role="alert" className="text-danger">{t(`errors.${error}`, t("errors.save_failed"))}</p>}
+      {items.length > 0 && <EstimateItems items={items} fresh={draft.estimate !== undefined} />}
+      {error && <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 font-semibold text-danger">{t(`errors.${error}`, t("errors.save_failed"))}</p>}
       <Button type="submit" disabled={busy || !valid}>{t("common.save")}</Button>
-      <div className="flex justify-center gap-6">
-        <button type="button" onClick={onClose} className="h-10 text-ink-soft">{t("common.cancel")}</button>
-        {draft.meal && (
-          <button type="button" disabled={busy} onClick={() => run(() => deleteMeal(draft.meal!.id))}
-            className="flex h-10 items-center gap-1.5 font-medium text-danger">
-            <Trash2 size={18} aria-hidden />{t("meal.delete")}
-          </button>
-        )}
-      </div>
+      {draft.meal && (
+        <button type="button" disabled={busy} onClick={() => run(() => deleteMeal(draft.meal!.id))}
+          className="-mt-1 flex h-11 items-center justify-center gap-2 font-bold text-danger">
+          <Trash2 size={20} aria-hidden />{t("meal.delete")}
+        </button>
+      )}
     </form>
   );
 }
@@ -136,6 +135,12 @@ function initialValues({ meal, estimate }: MealDraft): Values {
     carbs: Math.round(source.carbs),
     fat: Math.round(source.fat),
   };
+}
+
+/** "Heute" for today, else the short date ("Sa., 24. Okt."). */
+function dayLabel(date: Date, today: string): string {
+  return date.toDateString() === new Date().toDateString() ? today
+    : formatDate(date, { weekday: "short", day: "numeric", month: "short" });
 }
 
 /** Epoch milliseconds of `time` (HH:MM) on the local day of `day`. */

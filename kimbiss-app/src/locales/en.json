@@ -14,8 +14,10 @@
     "invite_code": "Invite code",
     "signin": "Sign in",
     "signup": "Create account",
-    "to_signup": "New here? Sign up with an invite code",
-    "to_signin": "Already have an account? Sign in"
+    "signup_question": "New here?",
+    "signup_action": "Sign up with an invite code",
+    "signin_question": "Have an account?",
+    "signin_action": "Sign in"
   },
   "errors": {
     "invalid_invite_code": "That invite code is not right.",
@@ -124,7 +126,10 @@
     "kcal": "Energy",
     "delete": "Delete meal",
     "recognized": "Seen in the photo",
-    "estimate_hint": "Estimated, please check"
+    "estimate_hint": "Estimated from the photo. Tap a number to correct it.",
+    "foods_one": "{{count}} food",
+    "foods_other": "{{count}} foods",
+    "item_detail": "{{grams}} g, {{protein}} g protein, {{carbs}} g carbs, {{fat}} g fat"
   },
   "photo": {
     "take": "Snap meal",
@@ -147,7 +152,9 @@
     "today": "Weight today",
     "chart_empty": "From two entries on, your progress shows up here.",
     "chart_label": "Weight over time with goal weight",
-    "delete": "Delete entry"
+    "delete": "Delete entry",
+    "history": "Entries",
+    "goal_short": "Goal {{kg}} kg"
   },
   "profile": {
     "targets": "Your daily targets",

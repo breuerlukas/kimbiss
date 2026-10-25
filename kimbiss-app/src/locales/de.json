@@ -14,8 +14,10 @@
     "invite_code": "Einladungscode",
     "signin": "Anmelden",
     "signup": "Konto erstellen",
-    "to_signup": "Neu hier? Mit Einladungscode registrieren",
-    "to_signin": "Schon ein Konto? Anmelden"
+    "signup_question": "Neu hier?",
+    "signup_action": "Mit Einladungscode registrieren",
+    "signin_question": "Schon ein Konto?",
+    "signin_action": "Anmelden"
   },
   "errors": {
     "invalid_invite_code": "Der Einladungscode stimmt nicht.",
@@ -124,7 +126,10 @@
     "kcal": "Energie",
     "delete": "Mahlzeit löschen",
     "recognized": "Auf dem Foto erkannt",
-    "estimate_hint": "Geschätzt, bitte prüfen"
+    "estimate_hint": "Geschätzt aus dem Foto. Tipp auf eine Zahl, um sie zu korrigieren.",
+    "foods_one": "{{count}} Lebensmittel",
+    "foods_other": "{{count}} Lebensmittel",
+    "item_detail": "{{grams}} g, {{protein}} g Eiweiß, {{carbs}} g KH, {{fat}} g Fett"
   },
   "photo": {
     "take": "Foto machen",
@@ -147,7 +152,9 @@
     "today": "Gewicht heute",
     "chart_empty": "Ab zwei Einträgen siehst du hier deinen Verlauf.",
     "chart_label": "Gewichtsverlauf mit Zielgewicht",
-    "delete": "Eintrag löschen"
+    "delete": "Eintrag löschen",
+    "history": "Einträge",
+    "goal_short": "Ziel {{kg}} kg"
   },
   "profile": {
     "targets": "Deine Tagesziele",

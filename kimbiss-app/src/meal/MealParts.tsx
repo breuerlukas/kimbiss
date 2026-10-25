@@ -1,29 +1,44 @@
 import { useTranslation } from "react-i18next";
-import { UtensilsCrossed } from "lucide-react";
+import { Utensils, X } from "lucide-react";
 import { formatNumber } from "../locales/format.ts";
-import { NumberInput } from "../ui/ui.tsx";
+import { NumberInput, RoundButton, SectionHeader } from "../ui/ui.tsx";
 import type { EstimateItem } from "./meals.ts";
 
 export const NUTRIENTS = ["kcal", "protein", "carbs", "fat"] as const;
 export type Nutrient = (typeof NUTRIENTS)[number];
 
-type HeaderProps = { name: string; time: string; onName: (name: string) => void; onTime: (time: string) => void };
+type HeaderProps = {
+  name: string;
+  day: string;
+  time: string;
+  onName: (name: string) => void;
+  onTime: (time: string) => void;
+  onClose: () => void;
+};
 
-/** Cutlery in a violet disc, the meal name over its time; both editable in place. */
-export function MealHeader({ name, time, onName, onTime }: HeaderProps) {
+/**
+ * Insulink's meal-detail head: cutlery in a violet disc, the meal name over
+ * "Heute, 12:40", a round close button on the right. Name and time are edited
+ * in place.
+ */
+export function MealHeader({ name, day, time, onName, onTime, onClose }: HeaderProps) {
   const { t } = useTranslation();
   return (
     <div className="flex items-center gap-3.5">
-      <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">
-        <UtensilsCrossed size={20} aria-hidden />
+      <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent">
+        <Utensils size={20} aria-hidden />
       </span>
       <div className="min-w-0 flex-1">
         <input value={name} onChange={(event) => onName(event.target.value)} maxLength={120}
           placeholder={t("meal.name")} aria-label={t("meal.name")}
-          className="w-full bg-transparent text-xl font-bold outline-none placeholder:text-ink-soft/60" />
-        <input type="time" value={time} onChange={(event) => onTime(event.target.value)} aria-label={t("meal.time")}
-          className="bg-transparent text-sm text-ink-soft outline-none" />
+          className="w-full bg-transparent text-[22px] leading-tight font-extrabold outline-none placeholder:font-bold placeholder:text-ink-soft/60" />
+        <label className="flex items-baseline gap-1 text-ink-soft">
+          {day},
+          <input type="time" value={time} onChange={(event) => onTime(event.target.value)} aria-label={t("meal.time")}
+            className="bg-transparent font-semibold text-ink-soft outline-none" />
+        </label>
       </div>
+      <RoundButton label={t("common.close")} onClick={onClose}><X size={20} /></RoundButton>
     </div>
   );
 }
@@ -37,41 +52,48 @@ type StripProps = { values: Partial<Record<Nutrient, number>>; onChange: (nutrie
 export function NutrientStrip({ values, onChange }: StripProps) {
   const { t } = useTranslation();
   return (
-    <div className="grid grid-cols-4 divide-x divide-line rounded-2xl bg-surface py-3.5">
+    <div className="grid grid-cols-4 divide-x divide-line rounded-[20px] border border-rim bg-surface py-3.5">
       {NUTRIENTS.map((nutrient) => (
-        <label key={nutrient} className="flex min-w-0 flex-col items-center gap-1 px-1">
-          <span className="w-full truncate text-center text-xs text-ink-soft">{t(nutrient === "carbs" ? "macros.carbs_short" : `macros.${nutrient}`)}</span>
-          <NumberInput value={values[nutrient]} onValue={(value) => onChange(nutrient, value)}
-            className={`w-full bg-transparent text-center text-xl font-extrabold outline-none ${nutrient === "kcal" ? "text-accent" : ""}`} />
-          <span className="text-xs text-ink-soft">{nutrient === "kcal" ? "kcal" : "g"}</span>
+        <label key={nutrient} className="flex min-w-0 flex-col items-center gap-0.5 px-1">
+          <span className="w-full truncate text-center text-[13px] text-ink-soft">{t(nutrient === "carbs" ? "macros.carbs_short" : `macros.${nutrient}`)}</span>
+          <NumberInput value={values[nutrient]} onValue={(value) => onChange(nutrient, value)} placeholder="0"
+            className={`w-full rounded-lg bg-transparent text-center text-[22px] font-extrabold outline-none placeholder:text-ink-soft/35 focus:bg-accent-soft ${nutrient === "kcal" ? "text-accent" : ""}`} />
+          <span className="text-[13px] font-semibold text-ink-soft">{nutrient === "kcal" ? "kcal" : "g"}</span>
         </label>
       ))}
     </div>
   );
 }
 
-/** The foods the photo showed, one row each: name over weight and macros, kcal right. */
-export function EstimateItems({ items }: { items: EstimateItem[] }) {
+/**
+ * The foods the photo showed, in one panel as Insulink lists a meal's
+ * products: name over its weight and macros, kcal on the right. A fresh
+ * estimate says under it that the numbers want a look.
+ */
+export function EstimateItems({ items, fresh }: { items: EstimateItem[]; fresh: boolean }) {
   const { t } = useTranslation();
   return (
     <section>
-      <h3 className="mb-2.5 flex justify-between px-2">
-        <span className="font-semibold">{t("meal.recognized")}</span>
-        <span className="text-sm text-ink-soft">{t("meal.estimate_hint")}</span>
-      </h3>
-      <ul className="divide-y divide-line rounded-2xl bg-surface">
+      <SectionHeader title={t("meal.recognized")}>
+        <span className="text-sm text-ink-soft">{t("meal.foods", { count: items.length })}</span>
+      </SectionHeader>
+      <ul className="divide-y divide-line rounded-[20px] border border-rim bg-surface">
         {items.map((item, position) => (
-          <li key={position} className="flex items-center gap-3 px-4 py-3">
+          <li key={position} className="flex min-h-[64px] items-center gap-3 px-4 py-3">
             <span className="min-w-0 flex-1">
-              <span className="block truncate font-semibold">{item.name}</span>
-              <span className="block truncate text-sm text-ink-soft">
-                {formatNumber(item.grams)} g, {formatNumber(item.protein)} g {t("macros.protein")}, {formatNumber(item.carbs)} g {t("macros.carbs_short")}, {formatNumber(item.fat)} g {t("macros.fat")}
+              <span className="block truncate font-bold">{item.name}</span>
+              <span className="block truncate text-[13px] text-ink-soft">
+                {t("meal.item_detail", {
+                  grams: formatNumber(item.grams), protein: formatNumber(item.protein),
+                  carbs: formatNumber(item.carbs), fat: formatNumber(item.fat),
+                })}
               </span>
             </span>
-            <span className="font-semibold">{formatNumber(item.kcal)} <span className="text-sm font-normal text-ink-soft">kcal</span></span>
+            <span className="text-[17px] font-extrabold whitespace-nowrap">{formatNumber(item.kcal)}<span className="text-sm font-semibold text-ink-soft"> kcal</span></span>
           </li>
         ))}
       </ul>
+      {fresh && <p className="mt-2 px-1 text-sm text-ink-soft">{t("meal.estimate_hint")}</p>}
     </section>
   );
 }
