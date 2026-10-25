@@ -13,20 +13,23 @@ const MACROS = [
 
 /**
  * What is left of today's energy as the headline, then one bar per macro.
- * Past the target it just states the surplus, in ink, never in alarm red.
+ * Past the target the surplus turns red, with a plus, and so does the bar.
  */
 export function Budget({ meals, profile }: BudgetProps) {
   const { t } = useTranslation();
   const eaten = sum(meals, "kcal");
   const left = Math.round(profile.kcal_target - eaten);
+  const over = left < 0;
   return (
     <section aria-label={t("today.budget")}>
-      <p className="text-7xl leading-none font-extrabold tracking-tighter">{formatNumber(Math.abs(left))}</p>
-      <p className="mt-1 text-lg font-semibold">{t(left >= 0 ? "today.kcal_left" : "today.kcal_over")}</p>
+      <p className={`text-7xl leading-none font-extrabold tracking-tighter ${over ? "text-danger" : ""}`}>
+        {over && "+"}{formatNumber(Math.abs(left))}
+      </p>
+      <p className={`mt-1 text-lg font-semibold ${over ? "text-danger" : ""}`}>{t(over ? "today.kcal_over" : "today.kcal_left")}</p>
       <p className="text-ink-soft">
         {t("today.of_target", { eaten: formatNumber(eaten), target: formatNumber(profile.kcal_target) })}
       </p>
-      <Bar share={eaten / profile.kcal_target} color="bg-accent" className="mt-4 h-3" />
+      <Bar share={eaten / profile.kcal_target} color={over ? "bg-danger" : "bg-accent"} className="mt-4 h-3" />
       <dl className="mt-5 grid grid-cols-3 gap-3">
         {MACROS.map((macro) => {
           const grams = sum(meals, macro.key);
