@@ -5,6 +5,8 @@ import de.kimbiss.api.api.security.AuthenticationFilter;
 import de.kimbiss.api.meal.estimate.EstimateQuota;
 import de.kimbiss.api.meal.estimate.MealEstimate;
 import de.kimbiss.api.meal.estimate.MealEstimateProgress;
+import de.kimbiss.api.meal.estimate.MealEstimateRun;
+import de.kimbiss.api.meal.estimate.MealEstimateRuns;
 import de.kimbiss.api.meal.estimate.MealEstimateStep;
 import de.kimbiss.api.meal.estimate.MealImage;
 import de.kimbiss.api.meal.estimate.MealPhotoEstimator;
@@ -37,6 +39,7 @@ public final class MealEstimateController {
   private final MealPhotoEstimator estimator;
   private final EstimateQuota quota;
   private final MealEstimateProgress progress;
+  private final MealEstimateRuns runs;
 
   @PostMapping("/meals/estimate")
   public CompletableFuture<Map<String, Object>> estimateMeal(
@@ -51,11 +54,32 @@ public final class MealEstimateController {
       throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "estimate_limit");
     }
     progress.report(userId, MealEstimateStep.looking());
-    return estimator.estimate(image, request.language(),
+    var run = runs.open(userId,
+      request.runId() == null ? "" : request.runId());
+    return estimator.estimate(image, request.language(), run,
         step -> progress.report(userId, step))
-      .whenComplete((estimate, failure) -> progress.finish(userId))
+      .whenComplete((estimate, failure) -> finish(userId, run))
       .thenApply(MealEstimate::information)
-      .exceptionally(this::estimateFailed);
+      .exceptionally(failure -> estimateFailed(run, failure));
+  }
+
+  /**
+   * Calls off the caller's run {@code run_id}, now or as soon as it opens. The
+   * app sends it when the user takes a new photo or leaves the camera: dropping
+   * the request alone would leave the model running, spending tokens on an
+   * answer nobody reads. Succeeds whether or not one ran.
+   */
+  @PostMapping("/meals/estimate/cancel")
+  public void cancelEstimate(
+    @RequestAttribute(AuthenticationFilter.USER_ID) UUID userId,
+    @Valid @RequestBody EstimateCancelRequest request
+  ) {
+    runs.cancel(userId, request.runId());
+  }
+
+  private void finish(UUID userId, MealEstimateRun run) {
+    progress.finish(userId);
+    runs.close(userId, run);
   }
 
   /**
@@ -70,8 +94,17 @@ public final class MealEstimateController {
       .orElse(Map.of());
   }
 
-  /** The app can only say it failed, so the reason goes to the server log. */
-  private Map<String, Object> estimateFailed(Throwable failure) {
+  /**
+   * The app can only say it failed, so the reason goes to the server log. A run
+   * the app called off is no failure, and its answer goes to an app that no
+   * longer listens.
+   */
+  private Map<String, Object> estimateFailed(
+    MealEstimateRun run, Throwable failure
+  ) {
+    if (run.cancelled()) {
+      throw new ApiException(HttpStatus.CONFLICT, "estimate_cancelled");
+    }
     LOGGER.error("Meal photo estimate failed", failure);
     throw new ApiException(HttpStatus.BAD_GATEWAY, "estimate_unavailable");
   }

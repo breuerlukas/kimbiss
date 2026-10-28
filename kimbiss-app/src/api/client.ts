@@ -36,10 +36,11 @@ export const session = {
  * (the device has no network), `unreachable` (network, but no answer from the
  * server), `server_error` (the server or its proxy broke, no code of its own),
  * or the api's own code. The browser caches nothing (the service worker keeps
- * the last answers for offline only), so a change shows at once.
+ * the last answers for offline only), so a change shows at once. Aborting
+ * `signal` drops the request; it then fails like a lost network.
  */
-export async function api<T>(method: string, path: string, body?: unknown): Promise<T> {
-  const response = await send(method, path, body);
+export async function api<T>(method: string, path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
+  const response = await send(method, path, body, signal);
   if (response.status === 401 && !path.startsWith("/auth/")) {
     session.clear();
     signedOutListener();
@@ -66,7 +67,7 @@ export function errorCode(failure: unknown): string {
   return failure instanceof ApiError ? failure.code : "unknown";
 }
 
-async function send(method: string, path: string, body?: unknown): Promise<Response> {
+async function send(method: string, path: string, body?: unknown, signal?: AbortSignal): Promise<Response> {
   const token = session.token();
   try {
     return await fetch(`/v1${path}`, {
@@ -77,6 +78,7 @@ async function send(method: string, path: string, body?: unknown): Promise<Respo
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: body === undefined ? undefined : JSON.stringify(body),
+      signal,
     });
   } catch {
     throw new ApiError(0, navigator.onLine ? "unreachable" : "offline");
