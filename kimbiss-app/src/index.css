@@ -116,6 +116,18 @@ dialog::backdrop {
   .step-in {
     animation: step-in 250ms ease-out;
   }
+
+  /* The shutter and the retake ring scale and fade into each other. */
+  .swap-in {
+    animation: swap-in 220ms ease-out;
+  }
+}
+
+@keyframes swap-in {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
 }
 
 @keyframes step-in {

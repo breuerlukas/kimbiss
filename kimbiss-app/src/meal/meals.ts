@@ -43,8 +43,14 @@ export function deleteMeal(id: string): Promise<void> {
   return api("DELETE", `/meals/${id}`);
 }
 
-export function estimateMeal(image: string, language: string): Promise<Estimate> {
-  return api("POST", "/meals/estimate", { image, language });
+/** `runId` names the run for {@link cancelEstimate}; `signal` drops the request. */
+export function estimateMeal(image: string, language: string, runId: string, signal: AbortSignal): Promise<Estimate> {
+  return api("POST", "/meals/estimate", { image, language, run_id: runId }, signal);
+}
+
+/** Stops the api's run too, so no tokens go to an answer nobody reads. */
+export function cancelEstimate(runId: string): Promise<void> {
+  return api("POST", "/meals/estimate/cancel", { run_id: runId });
 }
 
 export function findEstimateStep(): Promise<EstimateStep> {

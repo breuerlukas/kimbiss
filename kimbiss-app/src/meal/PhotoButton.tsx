@@ -3,9 +3,8 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { Camera } from "lucide-react";
 import { errorCode } from "../api/client.ts";
-import { AnalysingOverlay } from "./AnalysingOverlay.tsx";
 import { MealCamera } from "./MealCamera.tsx";
-import { estimateMeal, type Estimate } from "./meals.ts";
+import { cancelEstimate, estimateMeal, type Estimate } from "./meals.ts";
 import { photoToJpegBase64 } from "./photo.ts";
 
 type PhotoButtonProps = { onEstimate: (estimate: Estimate, photoUrl: string, photo: string) => void };
@@ -15,8 +14,10 @@ type PhotoButtonProps = { onEstimate: (estimate: Estimate, photoUrl: string, pho
  * opens Kimbiss' own camera ({@link MealCamera}), which also offers the gallery
  * and, where it cannot open, the system camera (`capture`; without it Android
  * opens the gallery). Either photo is shrunk and the api asked what is on the
- * plate. A failed try shows its error in the camera, if it is open, else in a
- * banner over the dock.
+ * plate, the camera staying open meanwhile. A failed try shows its error in the
+ * camera. "New photo" or closing the camera calls the estimate off: the
+ * request is dropped and the api told to stop the model, so no tokens go to an
+ * answer nobody reads.
  */
 export function PhotoButton({ onEstimate }: PhotoButtonProps) {
   const { t, i18n } = useTranslation();
@@ -26,10 +27,25 @@ export function PhotoButton({ onEstimate }: PhotoButtonProps) {
   const busy = photoUrl !== undefined;
   const [error, setError] = useState<string>();
   const [camera, setCamera] = useState(false);
+  /** The estimate of {@link photoUrl} while it runs. */
+  const run = useRef<{ id: string; abort: AbortController }>(undefined);
 
   function closeCamera() {
+    retake();
     setCamera(false);
     setError(undefined);
+  }
+
+  /** Calls the running estimate off and hands the live picture back. */
+  function retake() {
+    const current = run.current;
+    if (!current) {
+      return;
+    }
+    run.current = undefined;
+    current.abort.abort();
+    cancelEstimate(current.id).catch(() => undefined);
+    setPhotoUrl(undefined);
   }
 
   async function estimateFile(input: HTMLInputElement) {
@@ -43,11 +59,16 @@ export function PhotoButton({ onEstimate }: PhotoButtonProps) {
   async function estimate(file: Blob) {
     const url = URL.createObjectURL(file);
     let keepPhoto = false;
+    const current = { id: crypto.randomUUID(), abort: new AbortController() };
+    run.current = current;
     setPhotoUrl(url);
     setError(undefined);
     try {
       const photo = await photoToJpegBase64(file);
-      const result = await estimateMeal(photo, i18n.language);
+      const result = await estimateMeal(photo, i18n.language, current.id, current.abort.signal);
+      if (current.abort.signal.aborted) {
+        return;
+      }
       if (result.items.length === 0) {
         setError("no_food");
         return;
@@ -56,31 +77,27 @@ export function PhotoButton({ onEstimate }: PhotoButtonProps) {
       keepPhoto = true;
       setCamera(false);
     } catch (failure) {
-      setError(errorCode(failure));
+      if (!current.abort.signal.aborted) {
+        setError(errorCode(failure));
+      }
     } finally {
       if (!keepPhoto) {
         URL.revokeObjectURL(url);
       }
-      setPhotoUrl(undefined);
+      if (run.current === current) {
+        run.current = undefined;
+        setPhotoUrl(undefined);
+      }
     }
   }
 
   return (
     <>
       {camera && createPortal(
-        <MealCamera error={error} onShot={estimate} onClose={closeCamera}
+        <MealCamera error={error} photoUrl={photoUrl} onShot={estimate} onRetake={retake} onClose={closeCamera}
           onGallery={() => galleryInput.current?.click()}
-          onCameraApp={() => {
-            closeCamera();
-            cameraInput.current?.click();
-          }} />,
+          onCameraApp={() => cameraInput.current?.click()} />,
         document.body,
-      )}
-      {photoUrl && createPortal(<AnalysingOverlay photoUrl={photoUrl} />, document.body)}
-      {error && !camera && (
-        <p role="alert" className="fixed inset-x-3 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] mx-auto max-w-md rounded-2xl bg-danger-soft px-4 py-3 text-center font-semibold text-danger backdrop-blur-md">
-          {t(`errors.${error}`, t("errors.unknown"))}
-        </p>
       )}
       <button type="button" disabled={busy} aria-label={t("photo.take")}
         onClick={() => {

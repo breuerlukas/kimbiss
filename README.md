@@ -63,8 +63,15 @@ with a lookup; the CLI is killed after 120 s.
 
 While it runs, `GET /v1/meals/estimate/progress` answers the step the run is at
 (`looking`, `searching` with the query, `estimating` with a food's name), read
-off the CLI's stream as it arrives, and the app shows it under "Analysing". The
-model's own thinking is not shown.
+off the CLI's stream as it arrives, and the app shows it in the zoom's place.
+The model's own thinking is not shown.
+
+While a photo is analysed, the camera's shutter turns into "New photo". It and
+closing the camera call the estimate off: the app drops the request and sends
+`POST /v1/meals/estimate/cancel` with the `run_id` its estimate carried, and the
+api kills that run's CLI (or keeps a queued one from starting), so no tokens go
+to an answer nobody reads. A cancel never stops another photo's run, and one
+that arrives before its run opens stops it as it does.
 
 Sign-in token: run `claude setup-token` on any machine with a browser and put
 the token into `.env` as `CLAUDE_CODE_OAUTH_TOKEN`. It lasts about a year. For a
