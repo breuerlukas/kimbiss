@@ -125,8 +125,9 @@
     "time": "Time",
     "kcal": "Energy",
     "delete": "Delete meal",
+    "remove_item": "Remove food",
     "recognized": "Seen in the photo",
-    "estimate_hint": "Estimated from the photo. Tap a number to correct it.",
+    "estimate_hint": "Estimated from the photo. Tap a number or a food to correct it.",
     "foods_one": "{{count}} food",
     "foods_other": "{{count}} foods",
     "item_detail": "{{grams}} g, {{protein}} g protein, {{carbs}} g carbs, {{fat}} g fat"

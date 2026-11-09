@@ -125,8 +125,9 @@
     "time": "Uhrzeit",
     "kcal": "Energie",
     "delete": "Mahlzeit löschen",
+    "remove_item": "Lebensmittel entfernen",
     "recognized": "Auf dem Foto erkannt",
-    "estimate_hint": "Geschätzt aus dem Foto. Tipp auf eine Zahl, um sie zu korrigieren.",
+    "estimate_hint": "Geschätzt aus dem Foto. Tipp auf eine Zahl oder ein Lebensmittel, um es zu korrigieren.",
     "foods_one": "{{count}} Lebensmittel",
     "foods_other": "{{count}} Lebensmittel",
     "item_detail": "{{grams}} g, {{protein}} g Eiweiß, {{carbs}} g KH, {{fat}} g Fett"

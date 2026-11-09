@@ -4,7 +4,7 @@ import { Trash2 } from "lucide-react";
 import { errorCode } from "../api/client.ts";
 import { formatDate } from "../locales/format.ts";
 import { Button, Sheet } from "../ui/ui.tsx";
-import { EstimateItems, MealHeader, NutrientStrip, type Nutrient } from "./MealParts.tsx";
+import { EstimateItems, MealHeader, NUTRIENTS, NutrientStrip, type ItemDraft, type Nutrient } from "./MealParts.tsx";
 import { deleteMeal, findMealPhoto, saveMeal, type Estimate, type Meal } from "./meals.ts";
 
 /**
@@ -39,8 +39,23 @@ function MealForm({ draft, day, onClose, onSaved }: Omit<MealSheetProps, "draft"
   const [error, setError] = useState<string>();
   const savedPhotoUrl = useSavedPhoto(draft.meal);
   const photoUrl = draft.photoUrl ?? savedPhotoUrl ?? undefined;
-  const items = draft.estimate?.items ?? draft.meal?.items ?? [];
+  const [items, setItems] = useState<ItemDraft[]>(() => draft.estimate?.items ?? draft.meal?.items ?? []);
   const change = (patch: Partial<Values>) => setValues({ ...values, ...patch });
+
+  /**
+   * Puts a corrected food at `index`, or drops it for null. The meal's totals
+   * move by the difference, as in Insulink, so a total typed over keeps its
+   * own correction. Never below zero.
+   */
+  function changeItem(index: number, item: ItemDraft | null) {
+    const old = items[index];
+    const totals: Partial<Values> = {};
+    for (const nutrient of NUTRIENTS) {
+      totals[nutrient] = Math.max(0, Math.round((values[nutrient] ?? 0) + (item?.[nutrient] ?? 0) - (old[nutrient] ?? 0)));
+    }
+    change(totals);
+    setItems(item ? items.with(index, item) : items.filter((_, position) => position !== index));
+  }
   const valid = values.name.trim() !== "" && values.kcal !== undefined;
 
   async function run(action: () => Promise<unknown>) {
@@ -65,7 +80,7 @@ function MealForm({ draft, day, onClose, onSaved }: Omit<MealSheetProps, "draft"
       protein: values.protein ?? 0,
       carbs: values.carbs ?? 0,
       fat: values.fat ?? 0,
-      items,
+      items: items.map((item) => ({ ...item, kcal: item.kcal ?? 0, protein: item.protein ?? 0, carbs: item.carbs ?? 0, fat: item.fat ?? 0 })),
       photo: draft.photo,
     }, draft.meal?.id));
   }
@@ -78,7 +93,7 @@ function MealForm({ draft, day, onClose, onSaved }: Omit<MealSheetProps, "draft"
       {draft.meal?.has_photo && savedPhotoUrl === undefined && <div className="aspect-[4/3] w-full animate-pulse rounded-[20px] bg-line" />}
       {photoUrl && <img src={photoUrl} alt="" className="aspect-[4/3] w-full rounded-[20px] object-cover" />}
       <NutrientStrip values={values} onChange={(nutrient, value) => change({ [nutrient]: value })} />
-      {items.length > 0 && <EstimateItems items={items} fresh={draft.estimate !== undefined} />}
+      {items.length > 0 && <EstimateItems items={items} fresh={draft.estimate !== undefined} onChange={changeItem} />}
       {error && <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 font-semibold text-danger">{t(`errors.${error}`, t("errors.save_failed"))}</p>}
       <Button type="submit" disabled={busy || !valid}>{t("common.save")}</Button>
       {draft.meal && (

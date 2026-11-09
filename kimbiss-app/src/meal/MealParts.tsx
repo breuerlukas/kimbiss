@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { Utensils, X } from "lucide-react";
+import { useState } from "react";
+import { Pencil, Trash2, Utensils, X } from "lucide-react";
 import { formatNumber } from "../locales/format.ts";
 import { NumberInput, RoundButton, SectionHeader } from "../ui/ui.tsx";
 import type { EstimateItem } from "./meals.ts";
@@ -65,13 +66,20 @@ export function NutrientStrip({ values, onChange }: StripProps) {
   );
 }
 
+/** A food of the sheet: a nutrient is undefined while its field is cleared to type over. */
+export type ItemDraft = Omit<EstimateItem, Nutrient> & Partial<Record<Nutrient, number>>;
+
+type ItemsProps = { items: ItemDraft[]; fresh: boolean; onChange: (index: number, item: ItemDraft | null) => void };
+
 /**
  * The foods the photo showed, in one panel as Insulink lists a meal's
- * products: name over its weight and macros, kcal on the right. A fresh
- * estimate says under it that the numbers want a look.
+ * products: name over its weight and macros, kcal on the right. Tapping a
+ * food opens its nutrients under it for correction, and a button to remove
+ * it. A fresh estimate says under it that the numbers want a look.
  */
-export function EstimateItems({ items, fresh }: { items: EstimateItem[]; fresh: boolean }) {
+export function EstimateItems({ items, fresh, onChange }: ItemsProps) {
   const { t } = useTranslation();
+  const [open, setOpen] = useState<number>();
   return (
     <section>
       <SectionHeader title={t("meal.recognized")}>
@@ -79,17 +87,30 @@ export function EstimateItems({ items, fresh }: { items: EstimateItem[]; fresh: 
       </SectionHeader>
       <ul className="divide-y divide-line rounded-[20px] border border-rim bg-surface">
         {items.map((item, position) => (
-          <li key={position} className="flex min-h-[64px] items-center gap-3 px-4 py-3">
-            <span className="min-w-0 flex-1">
-              <span className="block truncate font-bold">{item.name}</span>
-              <span className="block truncate text-[13px] text-ink-soft">
-                {t("meal.item_detail", {
-                  grams: formatNumber(item.grams), protein: formatNumber(item.protein),
-                  carbs: formatNumber(item.carbs), fat: formatNumber(item.fat),
-                })}
+          <li key={position}>
+            <button type="button" aria-expanded={open === position} onClick={() => setOpen(open === position ? undefined : position)}
+              className="flex min-h-[64px] w-full items-center gap-3 px-4 py-3 text-left">
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-bold">{item.name}</span>
+                <span className="block truncate text-[13px] text-ink-soft">
+                  {t("meal.item_detail", {
+                    grams: formatNumber(item.grams), protein: formatNumber(item.protein ?? 0),
+                    carbs: formatNumber(item.carbs ?? 0), fat: formatNumber(item.fat ?? 0),
+                  })}
+                </span>
               </span>
-            </span>
-            <span className="text-[17px] font-extrabold whitespace-nowrap">{formatNumber(item.kcal)}<span className="text-sm font-semibold text-ink-soft"> kcal</span></span>
+              <span className="text-[17px] font-extrabold whitespace-nowrap">{formatNumber(item.kcal ?? 0)}<span className="text-sm font-semibold text-ink-soft"> kcal</span></span>
+              <Pencil size={18} aria-hidden className="shrink-0 text-ink-soft" />
+            </button>
+            {open === position && (
+              <div className="grid gap-2 px-3 pb-3">
+                <NutrientStrip values={item} onChange={(nutrient, value) => onChange(position, { ...item, [nutrient]: value })} />
+                <button type="button" onClick={() => { setOpen(undefined); onChange(position, null); }}
+                  className="flex h-11 items-center justify-center gap-2 font-bold text-danger">
+                  <Trash2 size={18} aria-hidden />{t("meal.remove_item")}
+                </button>
+              </div>
+            )}
           </li>
         ))}
       </ul>
