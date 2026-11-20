@@ -1,7 +1,9 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer, useRef, useState, type TouchEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { Camera, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { CalendarDays, Camera, ChevronDown, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useLoad } from "../api/use-load.ts";
+import { CalendarSheet } from "../calendar/CalendarSheet.tsx";
+import { startOfDay } from "../calendar/calendar.ts";
 import { formatDate, formatNumber } from "../locales/format.ts";
 import { MealSheet, type MealDraft } from "../meal/MealSheet.tsx";
 import { findMeals } from "../meal/meals.ts";
@@ -27,6 +29,8 @@ type TodayProps = {
 export function TodayScreen({ profile, draft, setDraft, onTakePhoto }: TodayProps) {
   const { t } = useTranslation();
   const [offset, setOffset] = useState(0);
+  const [calendar, setCalendar] = useState(false);
+  const swipe = useRef<{ x: number; y: number }>(undefined);
   const [, wake] = useReducer((count: number) => count + 1, 0);
   const now = new Date();
   const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, 12);
@@ -51,16 +55,35 @@ export function TodayScreen({ profile, draft, setDraft, onTakePhoto }: TodayProp
     setOffset(Math.min(0, offset + days));
   }
 
+  /** A sideways swipe of 60 px, clearly more across than down, moves a day; never inside a sheet. */
+  function endSwipe(event: TouchEvent) {
+    const start = swipe.current;
+    swipe.current = undefined;
+    const touch = event.changedTouches[0];
+    if (!start || (event.target as Element).closest("dialog")) {
+      return;
+    }
+    const [dx, dy] = [touch.clientX - start.x, touch.clientY - start.y];
+    if (Math.abs(dx) > 60 && Math.abs(dx) > 1.5 * Math.abs(dy)) {
+      shiftDay(dx < 0 ? 1 : -1);
+    }
+  }
+
   return (
-    <div>
+    <div onTouchStart={(event) => swipe.current = { x: event.touches[0].clientX, y: event.touches[0].clientY }} onTouchEnd={endSwipe}>
       <header className="flex items-center justify-between gap-3">
-        <div className="flex min-h-11 min-w-0 flex-col gap-0.5">
+        <button type="button" onClick={() => setCalendar(true)} aria-label={t("today.open_calendar", { day: formatDate(day, { weekday: "long", day: "numeric", month: "long" }) })}
+          className="flex min-h-11 min-w-0 flex-col gap-0.5 text-left">
           <span className="eyebrow truncate">{dayOverline(day)}</span>
-          <h1 className="truncate font-display text-[28px] leading-tight font-bold tracking-[-0.02em]">
-            {isToday ? t("today.title") : formatDate(day, { weekday: "long" })}
-          </h1>
-        </div>
+          <span className="flex min-w-0 items-center gap-1.5">
+            <h1 className="truncate font-display text-[28px] leading-tight font-bold tracking-[-0.02em]">
+              {isToday ? t("today.title") : formatDate(day, { weekday: "long" })}
+            </h1>
+            <ChevronDown size={18} aria-hidden className="shrink-0 text-ink-soft" />
+          </span>
+        </button>
         <div className="flex gap-2">
+          <RoundButton label={t("calendar.title")} onClick={() => setCalendar(true)}><CalendarDays size={18} aria-hidden /></RoundButton>
           <RoundButton label={t("today.previous_day")} onClick={() => shiftDay(-1)}><ChevronLeft size={18} aria-hidden /></RoundButton>
           <RoundButton label={t("today.next_day")} onClick={() => shiftDay(1)} disabled={isToday}><ChevronRight size={18} aria-hidden /></RoundButton>
         </div>
@@ -90,6 +113,11 @@ export function TodayScreen({ profile, draft, setDraft, onTakePhoto }: TodayProp
           </section>
         </>
       )}
+      <CalendarSheet open={calendar} day={day} target={profile.kcal_target} onClose={() => setCalendar(false)}
+        onPick={(picked) => {
+          setCalendar(false);
+          setOffset(Math.round((picked.getTime() - startOfDay(new Date()).getTime()) / (24 * 60 * 60 * 1000)));
+        }} />
       <MealSheet draft={draft} day={day} onClose={closeSheet}
         onSaved={() => {
           closeSheet();

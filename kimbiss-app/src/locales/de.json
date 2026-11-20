@@ -122,7 +122,8 @@
     "meal_macros": "E {{protein}} · K {{carbs}} · F {{fat}}",
     "empty_title": "Noch nichts eingetragen",
     "empty_hint": "Fotografier dein nächstes Essen.",
-    "empty_action": "Foto aufnehmen"
+    "empty_action": "Foto aufnehmen",
+    "open_calendar": "Kalender öffnen, gezeigt wird {{day}}"
   },
   "meal": {
     "add": "Mahlzeit eintragen",
@@ -193,5 +194,28 @@
     "weight": "Verlauf",
     "profile": "Profil",
     "label": "Hauptnavigation"
+  },
+  "calendar": {
+    "title": "Kalender",
+    "stats_one": "Ø {{average}} kcal · {{count}} Tag im Ziel",
+    "stats_other": "Ø {{average}} kcal · {{count}} Tage im Ziel",
+    "no_stats": "Noch keine abgeschlossenen Tage",
+    "previous_month": "Vorheriger Monat",
+    "next_month": "Nächster Monat",
+    "cell_kcal": "{{kcal}} von {{target}} kcal",
+    "not_logged": "nichts eingetragen",
+    "legend_under": "unter Ziel",
+    "legend_on": "im Ziel ±5 %",
+    "legend_over": "drüber",
+    "today": "heute",
+    "status_none": "nicht eingetragen",
+    "status_left": "noch {{kcal}} frei",
+    "status_over": "+{{kcal}} drüber",
+    "status_on": "im Ziel",
+    "status_under": "{{kcal}} unter Ziel",
+    "macro_protein": "E {{grams}} g",
+    "macro_carbs": "K {{grams}} g",
+    "macro_fat": "F {{grams}} g",
+    "open_day": "Diesen Tag öffnen"
   }
 }

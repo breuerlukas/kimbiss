@@ -30,8 +30,12 @@ export type Estimate = EstimateItem & { items: EstimateItem[] };
 
 /** Meals of the local day that `day` falls on, oldest first. */
 export function findMeals(day: Date): Promise<Meal[]> {
-  const from = new Date(day.getFullYear(), day.getMonth(), day.getDate());
-  const to = new Date(day.getFullYear(), day.getMonth(), day.getDate() + 1);
+  return findMealsBetween(new Date(day.getFullYear(), day.getMonth(), day.getDate()),
+    new Date(day.getFullYear(), day.getMonth(), day.getDate() + 1));
+}
+
+/** Meals from `from` up to, not including, `to`, oldest first. */
+export function findMealsBetween(from: Date, to: Date): Promise<Meal[]> {
   return api<Meal[]>("GET", `/meals?from=${from.getTime()}&to=${to.getTime() - 1}`);
 }
 
