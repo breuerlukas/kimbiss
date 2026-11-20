@@ -7,10 +7,15 @@ import { MealCamera } from "./MealCamera.tsx";
 import { cancelEstimate, estimateMeal, type Estimate } from "./meals.ts";
 import { photoToJpegBase64 } from "./photo.ts";
 
-type PhotoButtonProps = { onEstimate: (estimate: Estimate, photoUrl: string, photo: string) => void };
+type PhotoButtonProps = {
+  onEstimate: (estimate: Estimate, photoUrl: string, photo: string) => void;
+  /** Whether the camera is open; the app owns it, so other buttons can open it too. */
+  camera: boolean;
+  setCamera: (open: boolean) => void;
+};
 
 /**
- * The round camera button beside the dock, like Insulink's bolus button. It
+ * The round camera button beside the floating navigation, on every main screen. It
  * opens Kimbiss' own camera ({@link MealCamera}), which also offers the gallery
  * and, where it cannot open, the system camera (`capture`; without it Android
  * opens the gallery). Either photo is shrunk and the api asked what is on the
@@ -19,14 +24,13 @@ type PhotoButtonProps = { onEstimate: (estimate: Estimate, photoUrl: string, pho
  * request is dropped and the api told to stop the model, so no tokens go to an
  * answer nobody reads.
  */
-export function PhotoButton({ onEstimate }: PhotoButtonProps) {
+export function PhotoButton({ onEstimate, camera, setCamera }: PhotoButtonProps) {
   const { t, i18n } = useTranslation();
   const cameraInput = useRef<HTMLInputElement>(null);
   const galleryInput = useRef<HTMLInputElement>(null);
   const [photoUrl, setPhotoUrl] = useState<string>();
   const busy = photoUrl !== undefined;
   const [error, setError] = useState<string>();
-  const [camera, setCamera] = useState(false);
   /** The estimate of {@link photoUrl} while it runs. */
   const run = useRef<{ id: string; abort: AbortController }>(undefined);
 
@@ -104,8 +108,8 @@ export function PhotoButton({ onEstimate }: PhotoButtonProps) {
           setError(undefined);
           setCamera(true);
         }}
-        className="flex size-[62px] items-center justify-center rounded-full bg-accent text-accent-ink shadow-[0_8px_24px_rgb(29_21_38/0.18)] transition active:scale-95 disabled:opacity-60">
-        <Camera size={26} aria-hidden />
+        className="flex size-16 shrink-0 items-center justify-center rounded-full bg-accent text-accent-ink shadow-[0_12px_32px_rgb(0_0_0/0.4)] transition active:scale-95 disabled:opacity-60">
+        <Camera size={24} aria-hidden />
       </button>
       <input ref={cameraInput} type="file" accept="image/*" capture="environment" hidden
         onChange={(event) => estimateFile(event.target)} />

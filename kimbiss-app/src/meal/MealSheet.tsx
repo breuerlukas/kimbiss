@@ -90,11 +90,11 @@ function MealForm({ draft, day, onClose, onSaved }: Omit<MealSheetProps, "draft"
       <MealHeader name={values.name} day={dayLabel(draft.meal ? new Date(draft.meal.eaten_at) : day, t("today.title"))}
         time={values.time} onClose={onClose}
         onName={(name) => change({ name })} onTime={(time) => change({ time })} />
-      {draft.meal?.has_photo && savedPhotoUrl === undefined && <div className="aspect-[4/3] w-full animate-pulse rounded-[20px] bg-line" />}
+      {draft.meal?.has_photo && savedPhotoUrl === undefined && <div className="aspect-[4/3] w-full animate-pulse rounded-[20px] bg-surface-high" />}
       {photoUrl && <img src={photoUrl} alt="" className="aspect-[4/3] w-full rounded-[20px] object-cover" />}
       <NutrientStrip values={values} onChange={(nutrient, value) => change({ [nutrient]: value })} />
       {items.length > 0 && <EstimateItems items={items} fresh={draft.estimate !== undefined} onChange={changeItem} />}
-      {error && <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 font-semibold text-danger">{t(`errors.${error}`, t("errors.save_failed"))}</p>}
+      {error && <p role="alert" className="rounded-2xl bg-danger/10 px-4 py-3 font-semibold text-danger">{t(`errors.${error}`, t("errors.save_failed"))}</p>}
       <Button type="submit" disabled={busy || !valid}>{t("common.save")}</Button>
       {draft.meal && (
         <button type="button" disabled={busy} onClick={() => run(() => deleteMeal(draft.meal!.id))}
@@ -110,7 +110,7 @@ function MealForm({ draft, day, onClose, onSaved }: Omit<MealSheetProps, "draft"
  * The stored photo of a saved meal as an object URL, freed when the sheet
  * closes: undefined while it loads, null when it could not.
  */
-function useSavedPhoto(meal?: Meal) {
+export function useSavedPhoto(meal?: Meal) {
   const [url, setUrl] = useState<string | null>();
   useEffect(() => {
     if (!meal?.has_photo) {

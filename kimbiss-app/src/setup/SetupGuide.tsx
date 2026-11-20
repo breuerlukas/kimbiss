@@ -62,10 +62,10 @@ export function SetupGuide({ previous, onDone, onCancel }: GuideProps) {
     <main className="mx-auto flex min-h-dvh max-w-md flex-col px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
       <ol className="mb-8 flex gap-1.5" aria-label={t("setup.progress", { step: index + 1, total: steps.length })}>
         {steps.map((name, position) => (
-          <li key={name} className={`h-1.5 flex-1 rounded-full ${position <= index ? "bg-accent" : "bg-line"}`} />
+          <li key={name} className={`h-1.5 flex-1 rounded-full ${position <= index ? "bg-accent" : "bg-track"}`} />
         ))}
       </ol>
-      <h1 className="text-3xl leading-tight font-bold tracking-tight">{t(`setup.${step}.title`)}</h1>
+      <h1 className="font-display text-3xl leading-tight font-bold tracking-[-0.02em]">{t(`setup.${step}.title`)}</h1>
       <p className="mt-2 mb-6 text-ink-soft">{t(`setup.${step}.intro`)}</p>
       <div className="flex-1">
         {StepBody && <StepBody draft={draft} change={(patch) => setDraft({ ...draft, ...patch })} />}

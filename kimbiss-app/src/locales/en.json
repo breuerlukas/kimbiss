@@ -104,19 +104,25 @@
     "protein": "Protein",
     "carbs": "Carbs",
     "fat": "Fat",
-    "carbs_short": "Carbs"
+    "carbs_short": "Carbs",
+    "carbs_card": "Carbs"
   },
   "today": {
     "title": "Today",
     "budget": "Daily target",
-    "kcal_left": "kcal still free today",
-    "kcal_over": "kcal over the daily target",
-    "of_target": "{{eaten}} of {{target}} kcal eaten",
-    "receipt": "Your receipt",
-    "empty": "Nothing logged yet. Snap your next meal.",
-    "total": "Total",
+    "kcal_left": "Left today",
+    "kcal_over": "Over target",
     "previous_day": "Previous day",
-    "next_day": "Next day"
+    "next_day": "Next day",
+    "eaten": "{{kcal}} eaten",
+    "target": "Target {{kcal}}",
+    "meals": "Meals",
+    "meals_meta": "{{count}} · {{kcal}} kcal",
+    "meals_meta_empty": "0 kcal",
+    "meal_macros": "P {{protein}} · C {{carbs}} · F {{fat}}",
+    "empty_title": "Nothing logged yet",
+    "empty_hint": "Take a photo of your next meal.",
+    "empty_action": "Take photo"
   },
   "meal": {
     "add": "Add meal",
@@ -150,23 +156,42 @@
   },
   "weight": {
     "title": "Progress",
-    "goal": "Goal weight: {{kg}} kg",
     "today": "Weight today",
     "chart_empty": "From two entries on, your progress shows up here.",
-    "chart_label": "Weight over time with goal weight",
-    "delete": "Delete entry",
+    "chart_label": "Weight from {{from}} kg on {{fromDate}} to {{to}} kg on {{toDate}}, goal {{goal}} kg",
+    "delete": "Delete entry from {{date}}",
     "history": "Entries",
-    "goal_short": "Goal {{kg}} kg"
+    "goal_short": "Goal {{kg}}",
+    "overline": "Weight",
+    "left_before": "",
+    "left_after": " to go",
+    "goal_reached": "Goal reached",
+    "start": "Start {{kg}}",
+    "range": "Range",
+    "ranges": {
+      "week": "1W",
+      "month": "1M",
+      "quarter": "3M",
+      "all": "All"
+    },
+    "first": "Start",
+    "count_one": "{{count}} weighing",
+    "count_other": "{{count}} weighings"
   },
   "profile": {
     "targets": "Your daily targets",
     "rerun_setup": "Recalculate targets",
     "language": "Language",
-    "sign_out": "Sign out"
+    "sign_out": "Sign out",
+    "overline": "Settings",
+    "per_day": "per day",
+    "energy_share": "{{percent}} % energy",
+    "split_label": "Energy split: {{protein}} percent protein, {{carbs}} percent carbs, {{fat}} percent fat"
   },
   "tabs": {
     "today": "Today",
     "weight": "Progress",
-    "profile": "Profile"
+    "profile": "Profile",
+    "label": "Main navigation"
   }
 }

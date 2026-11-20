@@ -1,23 +1,18 @@
-import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Calculator, ChevronRight, LogOut } from "lucide-react";
 import { api, session } from "../api/client.ts";
 import { changeLanguage } from "../locales/i18n.ts";
 import { formatNumber } from "../locales/format.ts";
-import { Segmented, SectionHeader } from "../ui/ui.tsx";
+import { MACROS, MacroCard, Segmented, SectionHeader } from "../ui/ui.tsx";
 import type { Profile } from "./profile.ts";
 
 type ProfileScreenProps = { profile: Profile; onRerunSetup: () => void; onSignedOut: () => void };
 
-/** The daily targets, the way back into the setup guide, language, sign out; laid out like Insulink's profile. */
+/** The daily targets with their split of the energy, the way back into the setup guide, language, sign out. */
 export function ProfileScreen({ profile, onRerunSetup, onSignedOut }: ProfileScreenProps) {
   const { t, i18n } = useTranslation();
-  const targets = [
-    { key: "kcal", value: profile.kcal_target, unit: "kcal" },
-    { key: "protein", value: profile.protein_target, unit: "g" },
-    { key: "carbs", value: profile.carbs_target, unit: "g" },
-    { key: "fat", value: profile.fat_target, unit: "g" },
-  ];
+  const energy = MACROS.reduce((total, macro) => total + profile[`${macro.key}_target`] * macro.kcalPerGram, 0);
+  const share = (macro: (typeof MACROS)[number]) => energy ? Math.round(profile[`${macro.key}_target`] * macro.kcalPerGram / energy * 100) : 0;
 
   async function signOut() {
     await api("DELETE", "/session").catch(() => undefined);
@@ -27,45 +22,48 @@ export function ProfileScreen({ profile, onRerunSetup, onSignedOut }: ProfileScr
 
   return (
     <div>
-      <h1 className="mb-6 text-[22px] font-bold">{t("tabs.profile")}</h1>
-      <SectionHeader title={t("profile.targets")} />
-      <dl className="grid grid-cols-2 gap-2.5">
-        {targets.map((target) => (
-          <div key={target.key} className="rounded-[22px] border border-rim bg-surface px-4 py-3.5">
-            <dt className="text-[13px] text-ink-soft">{t(`macros.${target.key}`)}</dt>
-            <dd className="text-[28px] leading-tight font-extrabold tracking-[-0.03em]">
-              {formatNumber(target.value)}<span className="ml-1 text-sm font-semibold tracking-normal text-ink-soft">{target.unit}</span>
-            </dd>
+      <header className="flex flex-col gap-0.5">
+        <span className="eyebrow">{t("profile.overline")}</span>
+        <h1 className="font-display text-[28px] leading-tight font-bold tracking-[-0.02em]">{t("tabs.profile")}</h1>
+      </header>
+      <section className="mt-7">
+        <SectionHeader title={t("profile.targets")} />
+        <div className="flex flex-col gap-3.5 rounded-3xl border border-rim bg-surface p-[18px]">
+          <p className="flex items-start justify-between gap-3">
+            <span className="text-[13px] font-medium text-ink-soft">{t("macros.kcal")}</span>
+            <span className="font-mono text-[11px] text-ink-soft uppercase">{t("profile.per_day")}</span>
+          </p>
+          <p className="flex items-baseline gap-1.5 font-display">
+            <span className="text-[56px] leading-[0.9] font-extrabold tracking-[-0.04em]">{formatNumber(profile.kcal_target)}</span>
+            <span className="text-lg font-medium text-ink-soft">kcal</span>
+          </p>
+          <div role="img" className="flex h-2.5 gap-[3px]"
+            aria-label={t("profile.split_label", { protein: share(MACROS[0]), carbs: share(MACROS[1]), fat: share(MACROS[2]) })}>
+            {MACROS.map((macro) => <span key={macro.key} className={`rounded-full ${macro.bar}`} style={{ width: `${share(macro)}%` }} />)}
           </div>
-        ))}
-      </dl>
-      <div className="mt-2.5 rounded-[20px] border border-rim bg-surface">
-        <ListRow icon={<Calculator size={20} aria-hidden />} label={t("profile.rerun_setup")} onClick={onRerunSetup} />
-      </div>
-      <section className="mt-9">
+        </div>
+        <div className="mt-2 grid grid-cols-3 gap-2">
+          {MACROS.map((macro) => (
+            <MacroCard key={macro.key} macro={macro} value={formatNumber(profile[`${macro.key}_target`])} unit="g"
+              footer={t("profile.energy_share", { percent: share(macro) })} />
+          ))}
+        </div>
+        <button type="button" onClick={onRerunSetup}
+          className="mt-2 flex h-16 w-full items-center gap-3 rounded-[20px] border border-rim bg-surface px-3 text-left">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent"><Calculator size={20} aria-hidden /></span>
+          <span className="flex-1 text-[15px] font-semibold">{t("profile.rerun_setup")}</span>
+          <ChevronRight size={20} aria-hidden className="text-ink-soft" />
+        </button>
+      </section>
+      <section className="mt-7">
         <SectionHeader title={t("profile.language")} />
-        <Segmented value={i18n.language} onChange={changeLanguage}
+        <Segmented label={t("profile.language")} value={i18n.language} onChange={changeLanguage}
           options={[{ value: "de", label: "Deutsch" }, { value: "en", label: "English" }]} />
       </section>
-      <div className="mt-9 rounded-[20px] border border-rim bg-surface">
-        <ListRow danger icon={<LogOut size={20} aria-hidden />} label={t("profile.sign_out")} onClick={signOut} />
-      </div>
+      <button type="button" onClick={signOut}
+        className="mt-7 flex h-14 w-full items-center gap-3 rounded-[20px] border border-danger/18 bg-danger-soft px-3 text-[15px] font-semibold text-danger">
+        <LogOut size={20} aria-hidden />{t("profile.sign_out")}
+      </button>
     </div>
-  );
-}
-
-type ListRowProps = { icon: ReactNode; label: string; onClick: () => void; danger?: boolean };
-
-/** Insulink's list row: icon in a tinted disc, the label, a chevron; a dangerous one in red without. */
-function ListRow({ icon, label, onClick, danger = false }: ListRowProps) {
-  return (
-    <button type="button" onClick={onClick}
-      className={`flex min-h-[64px] w-full items-center gap-3.5 px-4 text-left font-bold ${danger ? "text-danger" : ""}`}>
-      <span className={`flex size-10 shrink-0 items-center justify-center rounded-full ${danger ? "bg-danger-soft" : "bg-accent-soft text-accent"}`}>
-        {icon}
-      </span>
-      <span className="flex-1">{label}</span>
-      {!danger && <ChevronRight size={20} aria-hidden className="text-ink-soft" />}
-    </button>
   );
 }

@@ -1,64 +1,65 @@
 @import "tailwindcss";
 
-/* Lilac paper, aubergine ink and a violet accent (Kim's favourite colour):
-   an Imbiss menu board, not a fitness dashboard. Macros keep one colour each
-   everywhere they appear. The structure is Insulink's: quiet panels with a
-   fine rim, lists in one panel, pill buttons, no shadows but the dock's. */
+/* Night Receipt: one dark theme. All colours live here and nowhere else;
+   Tailwind sees them as utility colours (bg-surface, text-ink) through @theme below.
+   Spec name -> token: background=paper, textPrimary=ink, textMuted=ink-soft,
+   textDisabled=ink-faint, border=rim, borderStrong=rim-strong, onAccent=accent-ink,
+   eiweiß=protein (the accent). */
 :root {
-  color-scheme: light dark;
-  --paper: #f5f1fb;
-  --surface: #ffffff;
-  --ink: #2a1b3d;
-  --ink-soft: #6b5f78;
-  --line: #e2d9ef;
-  --accent: #7d4cdb;
-  --accent-ink: #ffffff;
-  --protein: #c04a7e;
-  --carbs: #d49a12;
-  --fat: #4f8f6b;
-  --danger: #b8432b;
-  --rim: rgb(42 27 61 / 0.07);
-  --accent-soft: rgb(125 76 219 / 0.11);
-  --accent-text: #5a2fb5;
-  --danger-soft: rgb(184 67 43 / 0.1);
-  --dock: #ffffff;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #1d1526;
-    --surface: #2a2035;
-    --ink: #f3eef7;
-    --ink-soft: #b3a8bf;
-    --line: #3d3249;
-    --protein: #e07aa8;
-    --carbs: #f0bb3a;
-    --fat: #7cc29b;
-    --danger: #ef8a72;
-    --accent: #b48cf7;
-    --accent-ink: #1d1526;
-    --rim: rgb(243 238 247 / 0.07);
-    --accent-soft: rgb(180 140 247 / 0.16);
-    --accent-text: #d6c2fc;
-    --danger-soft: rgb(239 138 114 / 0.14);
-    --dock: #2f2440;
-  }
+  color-scheme: dark;
+  --paper: #14101a;
+  --surface: #1e1825;
+  --surface-raised: #241d2c;
+  --surface-high: #2c2436;
+  --sheet: #1a1521;
+  --rim: rgb(255 255 255 / 0.06);
+  --rim-strong: rgb(255 255 255 / 0.08);
+  --track: rgb(255 255 255 / 0.07);
+  --line: rgb(255 255 255 / 0.06);
+  --ink: #f4f0f8;
+  --ink-soft: #a79fb3;
+  --ink-faint: #5e5568;
+  --accent: #c4a6ff;
+  --accent-soft: rgb(196 166 255 / 0.14);
+  --accent-text: #c4a6ff;
+  --accent-ink: #14101a;
+  --protein: #c4a6ff;
+  --carbs: #ffc77a;
+  --fat: #7fd8c4;
+  --over: #ff9f7a;
+  --under: #6e5a93;
+  /* `under` is too dark for text (2.9:1); its chip writes in this light tint. */
+  --under-text: #cdb9f2;
+  --danger: #ff9a8a;
+  --danger-soft: rgb(255 154 138 / 0.06);
+  --dock: rgb(36 29 44 / 0.92);
 }
 
 @theme inline {
-  --font-sans: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
   --color-paper: var(--paper);
   --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-high: var(--surface-high);
+  --color-sheet: var(--sheet);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
   --color-line: var(--line);
+  --color-track: var(--track);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
   --color-protein: var(--protein);
   --color-carbs: var(--carbs);
   --color-fat: var(--fat);
+  --color-over: var(--over);
+  --color-under: var(--under);
+  --color-under-text: var(--under-text);
   --color-danger: var(--danger);
   --color-rim: var(--rim);
+  --color-rim-strong: var(--rim-strong);
   --color-accent-soft: var(--accent-soft);
   --color-accent-text: var(--accent-text);
   --color-danger-soft: var(--danger-soft);
@@ -70,6 +71,7 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-sans);
+  font-optical-sizing: auto;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
 }
@@ -95,16 +97,22 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   outline-offset: 2px;
 }
 
-/* The torn bottom edge of the day's receipt. */
-.receipt-edge {
-  --tooth: 10px;
-  mask:
-    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg)
-    50% / calc(var(--tooth) * 2) 100%;
+dialog::backdrop {
+  background: rgb(8 6 11 / 0.6);
 }
 
-dialog::backdrop {
-  background: rgb(29 21 38 / 0.45);
+/* Every icon in one line weight. */
+svg.lucide {
+  stroke-width: 1.8px;
+}
+
+/* Small mono labels: capitals, spaced out. */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
 }
 
 @media (prefers-reduced-motion: no-preference) {
