@@ -72,7 +72,8 @@ body {
   color: var(--ink);
   font-family: var(--font-sans);
   -webkit-tap-highlight-color: transparent;
-  overscroll-behavior-y: none;
+  /* No browser back gesture or bounce: sideways swipes switch tabs. */
+  overscroll-behavior: none;
 }
 
 body {
@@ -119,6 +120,19 @@ svg.lucide {
     animation: sheet-up 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
+  /* A new tab slides in from the side it sits on in the navigation. */
+  .tab-from-right {
+    animation: tab-from-right 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .tab-from-left {
+    animation: tab-from-left 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .tab-label {
+    animation: step-in 300ms ease-out;
+  }
+
   /* A new estimate step fades in over the old one. */
   .step-in {
     animation: step-in 250ms ease-out;
@@ -127,6 +141,20 @@ svg.lucide {
   /* The shutter and the retake ring scale and fade into each other. */
   .swap-in {
     animation: swap-in 220ms ease-out;
+  }
+}
+
+@keyframes tab-from-right {
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+}
+
+@keyframes tab-from-left {
+  from {
+    transform: translateX(-40px);
+    opacity: 0;
   }
 }
 

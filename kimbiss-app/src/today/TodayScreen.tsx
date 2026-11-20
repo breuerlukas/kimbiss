@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef, useState, type TouchEvent } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CalendarDays, Camera, ChevronDown, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useLoad } from "../api/use-load.ts";
@@ -30,7 +30,6 @@ export function TodayScreen({ profile, draft, setDraft, onTakePhoto }: TodayProp
   const { t } = useTranslation();
   const [offset, setOffset] = useState(0);
   const [calendar, setCalendar] = useState(false);
-  const swipe = useRef<{ x: number; y: number }>(undefined);
   const [, wake] = useReducer((count: number) => count + 1, 0);
   const now = new Date();
   const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, 12);
@@ -55,22 +54,8 @@ export function TodayScreen({ profile, draft, setDraft, onTakePhoto }: TodayProp
     setOffset(Math.min(0, offset + days));
   }
 
-  /** A sideways swipe of 60 px, clearly more across than down, moves a day; never inside a sheet. */
-  function endSwipe(event: TouchEvent) {
-    const start = swipe.current;
-    swipe.current = undefined;
-    const touch = event.changedTouches[0];
-    if (!start || (event.target as Element).closest("dialog")) {
-      return;
-    }
-    const [dx, dy] = [touch.clientX - start.x, touch.clientY - start.y];
-    if (Math.abs(dx) > 60 && Math.abs(dx) > 1.5 * Math.abs(dy)) {
-      shiftDay(dx < 0 ? 1 : -1);
-    }
-  }
-
   return (
-    <div onTouchStart={(event) => swipe.current = { x: event.touches[0].clientX, y: event.touches[0].clientY }} onTouchEnd={endSwipe}>
+    <div>
       <header className="flex items-center justify-between gap-3">
         <button type="button" onClick={() => setCalendar(true)} aria-label={t("today.open_calendar", { day: formatDate(day, { weekday: "long", day: "numeric", month: "long" }) })}
           className="flex min-h-11 min-w-0 flex-col gap-0.5 text-left">
