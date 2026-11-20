@@ -34,7 +34,7 @@ export function ProfileScreen({ profile, onRerunSetup, onSignedOut }: ProfileScr
             <span className="font-mono text-[11px] text-ink-soft uppercase">{t("profile.per_day")}</span>
           </p>
           <p className="flex items-baseline gap-1.5 font-display">
-            <span className="text-[56px] leading-[0.9] font-extrabold tracking-[-0.04em]">{formatNumber(profile.kcal_target)}</span>
+            <span className="text-[56px] leading-[0.9] font-extrabold tracking-[-0.035em]">{formatNumber(profile.kcal_target)}</span>
             <span className="text-lg font-medium text-ink-soft">kcal</span>
           </p>
           <div role="img" className="flex h-2.5 gap-[3px]"

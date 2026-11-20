@@ -23,7 +23,7 @@ export function Budget({ meals, profile }: BudgetProps) {
     <section aria-label={t("today.budget")}>
       <p className="mt-7 text-[13px] font-medium text-ink-soft">{t(over ? "today.kcal_over" : "today.kcal_left")}</p>
       <p className={`mt-1.5 flex items-baseline gap-2 font-display ${over ? "text-over" : ""}`}>
-        <span className="text-[88px] leading-[0.9] font-extrabold tracking-[-0.045em]">{over && "+"}{formatNumber(Math.abs(left))}</span>
+        <span className="text-[88px] leading-[0.9] font-extrabold tracking-[-0.035em]">{over && "+"}{formatNumber(Math.abs(left))}</span>
         <span className="text-[22px] font-medium text-ink-soft">kcal</span>
       </p>
       <div aria-hidden className="mt-5 flex gap-[3px]">

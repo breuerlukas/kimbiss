@@ -63,7 +63,7 @@ export function WeightScreen({ profile }: { profile: Profile }) {
         <>
           <div className="mt-5 flex flex-wrap items-end justify-between gap-2">
             <p className="flex items-baseline gap-1.5 font-display">
-              <span className="text-[76px] leading-[0.9] font-extrabold tracking-[-0.045em]">{formatNumber(latest.kg, 1)}</span>
+              <span className="text-[76px] leading-[0.9] font-extrabold tracking-[-0.035em]">{formatNumber(latest.kg, 1)}</span>
               <span className="text-[22px] font-medium text-ink-soft">kg</span>
             </p>
             {latest.kg !== start && <span className="mb-1.5"><Change kg={latest.kg - start} toward={towardGoal(start, latest.kg)} arrow /></span>}

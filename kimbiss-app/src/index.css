@@ -37,7 +37,7 @@
 
 @theme inline {
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
   --color-paper: var(--paper);
   --color-surface: var(--surface);
@@ -71,7 +71,6 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-sans);
-  font-optical-sizing: auto;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
 }

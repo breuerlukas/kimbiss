@@ -34,7 +34,7 @@ export function RoundButton({ label, className = "", ...props }: RoundButtonProp
   );
 }
 
-/** A section's title, Bricolage 20/700, a mono meta beside it, optional buttons on the right. */
+/** A section's title, display font 20/700, a mono meta beside it, optional buttons on the right. */
 export function SectionHeader({ title, meta, children }: { title: string; meta?: string; children?: ReactNode }) {
   return (
     <div className="mb-3 flex min-h-11 items-center justify-between gap-3">
@@ -65,13 +65,15 @@ export function MacroCard({ macro, value, unit, share, footer }: {
 }) {
   const { t } = useTranslation();
   return (
-    <div className="flex min-w-0 flex-col gap-2 rounded-[18px] border border-rim bg-surface p-3">
+    <div className="flex min-w-0 flex-col gap-2 rounded-[18px] border border-rim bg-surface p-3 max-[379px]:px-2.5">
       <div className="flex min-w-0 items-center gap-1.5">
         <span aria-hidden className={`size-2 shrink-0 rounded-full ${macro.dot}`} />
-        <span className="truncate text-xs font-medium text-ink-soft">{t(macro.key === "carbs" ? "macros.carbs_card" : `macros.${macro.key}`)}</span>
+        {/* Under 390 px "Kohlenhydr." no longer fits beside its dot: KH there. */}
+        <span className="truncate text-xs font-medium text-ink-soft max-[379px]:hidden">{t(macro.key === "carbs" ? "macros.carbs_card" : `macros.${macro.key}`)}</span>
+        <span className="hidden truncate text-xs font-medium text-ink-soft max-[379px]:inline">{t(macro.key === "carbs" ? "macros.carbs_short" : `macros.${macro.key}`)}</span>
       </div>
-      <div className="truncate font-display text-[22px] leading-tight font-bold tracking-[-0.02em]">
-        {value}<span className="text-xs font-medium tracking-normal text-ink-soft"> {unit}</span>
+      <div className="font-display text-[22px] leading-tight font-bold tracking-[-0.02em] whitespace-nowrap max-[379px]:text-[19px]">
+        {value}<span className="text-xs font-medium tracking-normal text-ink-soft max-[379px]:text-[11px]"> {unit}</span>
       </div>
       {share !== undefined && (
         <div className={`h-1 rounded-full ${macro.track}`}>
