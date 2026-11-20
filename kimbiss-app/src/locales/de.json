@@ -104,19 +104,25 @@
     "protein": "Eiweiß",
     "carbs": "Kohlenhydrate",
     "fat": "Fett",
-    "carbs_short": "KH"
+    "carbs_short": "KH",
+    "carbs_card": "Kohlenhydr."
   },
   "today": {
     "title": "Heute",
     "budget": "Tagesziel",
-    "kcal_left": "kcal sind heute noch frei",
-    "kcal_over": "kcal über dem Tagesziel",
-    "of_target": "{{eaten}} von {{target}} kcal gegessen",
-    "receipt": "Dein Bon",
-    "empty": "Noch nichts eingetragen. Fotografier dein nächstes Essen.",
-    "total": "Summe",
+    "kcal_left": "Noch frei",
+    "kcal_over": "Drüber",
     "previous_day": "Vorheriger Tag",
-    "next_day": "Nächster Tag"
+    "next_day": "Nächster Tag",
+    "eaten": "{{kcal}} gegessen",
+    "target": "Ziel {{kcal}}",
+    "meals": "Mahlzeiten",
+    "meals_meta": "{{count}} · {{kcal}} kcal",
+    "meals_meta_empty": "0 kcal",
+    "meal_macros": "E {{protein}} · K {{carbs}} · F {{fat}}",
+    "empty_title": "Noch nichts eingetragen",
+    "empty_hint": "Fotografier dein nächstes Essen.",
+    "empty_action": "Foto aufnehmen"
   },
   "meal": {
     "add": "Mahlzeit eintragen",
@@ -150,23 +156,42 @@
   },
   "weight": {
     "title": "Verlauf",
-    "goal": "Zielgewicht: {{kg}} kg",
     "today": "Gewicht heute",
     "chart_empty": "Ab zwei Einträgen siehst du hier deinen Verlauf.",
-    "chart_label": "Gewichtsverlauf mit Zielgewicht",
-    "delete": "Eintrag löschen",
+    "chart_label": "Gewichtsverlauf von {{from}} kg am {{fromDate}} auf {{to}} kg am {{toDate}}, Ziel {{goal}} kg",
+    "delete": "Eintrag vom {{date}} löschen",
     "history": "Einträge",
-    "goal_short": "Ziel {{kg}} kg"
+    "goal_short": "Ziel {{kg}}",
+    "overline": "Gewicht",
+    "left_before": "Noch ",
+    "left_after": " bis zum Ziel",
+    "goal_reached": "Ziel erreicht",
+    "start": "Start {{kg}}",
+    "range": "Zeitraum",
+    "ranges": {
+      "week": "1W",
+      "month": "1M",
+      "quarter": "3M",
+      "all": "Alles"
+    },
+    "first": "Start",
+    "count_one": "{{count}} Messung",
+    "count_other": "{{count}} Messungen"
   },
   "profile": {
     "targets": "Deine Tagesziele",
     "rerun_setup": "Ziele neu berechnen",
     "language": "Sprache",
-    "sign_out": "Abmelden"
+    "sign_out": "Abmelden",
+    "overline": "Einstellungen",
+    "per_day": "pro Tag",
+    "energy_share": "{{percent}} % Energie",
+    "split_label": "Energieverteilung: {{protein}} Prozent Eiweiß, {{carbs}} Prozent Kohlenhydrate, {{fat}} Prozent Fett"
   },
   "tabs": {
     "today": "Heute",
     "weight": "Verlauf",
-    "profile": "Profil"
+    "profile": "Profil",
+    "label": "Hauptnavigation"
   }
 }

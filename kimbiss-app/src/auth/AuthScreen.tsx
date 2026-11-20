@@ -35,7 +35,7 @@ export function AuthScreen({ onSignedIn }: { onSignedIn: () => void }) {
     <main className="mx-auto flex min-h-dvh max-w-sm flex-col px-6 pt-[max(2.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
       <div className="flex flex-1 flex-col justify-center">
         <img src="/favicon.svg" alt="" className="mx-auto size-16" />
-        <h1 className="mt-5 text-center text-5xl font-extrabold tracking-[-0.04em]">Kimbiss</h1>
+        <h1 className="mt-5 text-center font-display text-5xl font-extrabold tracking-[-0.035em]">Kimbiss</h1>
         <p className="mt-2 mb-9 text-center text-ink-soft">{t("auth.tagline")}</p>
         <form onSubmit={submit} className="grid gap-4">
           <Field label={t("auth.name")} value={name} onChange={(event) => setName(event.target.value)}
@@ -47,7 +47,7 @@ export function AuthScreen({ onSignedIn }: { onSignedIn: () => void }) {
             <Field label={t("auth.invite_code")} value={inviteCode}
               onChange={(event) => setInviteCode(event.target.value)} autoCapitalize="none" required />
           )}
-          {error && <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 font-semibold text-danger">{t(`errors.${error}`, t("errors.unknown"))}</p>}
+          {error && <p role="alert" className="rounded-2xl bg-danger/10 px-4 py-3 font-semibold text-danger">{t(`errors.${error}`, t("errors.unknown"))}</p>}
           <Button type="submit" disabled={busy} className="mt-2">{t(`auth.${mode}`)}</Button>
         </form>
       </div>

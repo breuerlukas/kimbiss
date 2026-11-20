@@ -32,7 +32,7 @@ export function MealHeader({ name, day, time, onName, onTime, onClose }: HeaderP
       <div className="min-w-0 flex-1">
         <input value={name} onChange={(event) => onName(event.target.value)} maxLength={120}
           placeholder={t("meal.name")} aria-label={t("meal.name")}
-          className="w-full bg-transparent text-[22px] leading-tight font-extrabold outline-none placeholder:font-bold placeholder:text-ink-soft/60" />
+          className="w-full bg-transparent font-display text-[22px] leading-tight font-bold outline-none placeholder:font-bold placeholder:text-ink-soft/60" />
         <label className="flex items-baseline gap-1 text-ink-soft">
           {day},
           <input type="time" value={time} onChange={(event) => onTime(event.target.value)} aria-label={t("meal.time")}
@@ -58,7 +58,7 @@ export function NutrientStrip({ values, onChange }: StripProps) {
         <label key={nutrient} className="flex min-w-0 flex-col items-center gap-0.5 px-1">
           <span className="w-full truncate text-center text-[13px] text-ink-soft">{t(nutrient === "carbs" ? "macros.carbs_short" : `macros.${nutrient}`)}</span>
           <NumberInput value={values[nutrient]} onValue={(value) => onChange(nutrient, value)} placeholder="0"
-            className={`w-full rounded-lg bg-transparent text-center text-[22px] font-extrabold outline-none placeholder:text-ink-soft/35 focus:bg-accent-soft ${nutrient === "kcal" ? "text-accent" : ""}`} />
+            className={`w-full rounded-lg bg-transparent text-center font-display text-[22px] font-bold outline-none placeholder:text-ink-soft/35 focus:bg-accent-soft ${nutrient === "kcal" ? "text-accent" : ""}`} />
           <span className="text-[13px] font-semibold text-ink-soft">{nutrient === "kcal" ? "kcal" : "g"}</span>
         </label>
       ))}
@@ -99,7 +99,7 @@ export function EstimateItems({ items, fresh, onChange }: ItemsProps) {
                   })}
                 </span>
               </span>
-              <span className="text-[17px] font-extrabold whitespace-nowrap">{formatNumber(item.kcal ?? 0)}<span className="text-sm font-semibold text-ink-soft"> kcal</span></span>
+              <span className="font-display text-[17px] font-bold whitespace-nowrap">{formatNumber(item.kcal ?? 0)}<span className="text-sm font-semibold text-ink-soft"> kcal</span></span>
               <Pencil size={18} aria-hidden className="shrink-0 text-ink-soft" />
             </button>
             {open === position && (
