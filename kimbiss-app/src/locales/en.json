@@ -122,7 +122,8 @@
     "meal_macros": "P {{protein}} · C {{carbs}} · F {{fat}}",
     "empty_title": "Nothing logged yet",
     "empty_hint": "Take a photo of your next meal.",
-    "empty_action": "Take photo"
+    "empty_action": "Take photo",
+    "open_calendar": "Open calendar, showing {{day}}"
   },
   "meal": {
     "add": "Add meal",
@@ -193,5 +194,28 @@
     "weight": "Progress",
     "profile": "Profile",
     "label": "Main navigation"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "stats_one": "Ø {{average}} kcal · {{count}} day on target",
+    "stats_other": "Ø {{average}} kcal · {{count}} days on target",
+    "no_stats": "No finished days yet",
+    "previous_month": "Previous month",
+    "next_month": "Next month",
+    "cell_kcal": "{{kcal}} of {{target}} kcal",
+    "not_logged": "nothing logged",
+    "legend_under": "under target",
+    "legend_on": "on target ±5 %",
+    "legend_over": "over",
+    "today": "today",
+    "status_none": "not logged",
+    "status_left": "{{kcal}} left",
+    "status_over": "+{{kcal}} over",
+    "status_on": "on target",
+    "status_under": "{{kcal}} under target",
+    "macro_protein": "P {{grams}} g",
+    "macro_carbs": "C {{grams}} g",
+    "macro_fat": "F {{grams}} g",
+    "open_day": "Open this day"
   }
 }

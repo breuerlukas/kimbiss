@@ -194,10 +194,10 @@ export function Sheet({ open, onClose, children, className = "max-h-[92dvh]", la
         }
         drag.current = undefined;
       }}
-      className={`mx-auto mt-auto mb-0 w-full max-w-lg rounded-t-[32px] border-t border-rim-strong bg-sheet p-0 text-ink outline-none ${className}`}
+      className={`mx-auto mt-auto mb-0 w-full max-w-lg flex-col rounded-t-[32px] border-t border-rim-strong bg-sheet p-0 text-ink outline-none open:flex ${className}`}
     >
       <div aria-hidden className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-white/18" />
-      <div className="px-4 pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))]">{children}</div>
+      <div className="flex flex-1 flex-col px-4 pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))]">{children}</div>
     </dialog>
   );
 }
